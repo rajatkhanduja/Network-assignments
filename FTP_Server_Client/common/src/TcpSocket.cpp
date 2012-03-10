@@ -4,7 +4,6 @@
 #include <cstring>
 #include <ext/stdio_filebuf.h>
 
-using std::ios;
 using __gnu_cxx::stdio_filebuf;
 
 inline stdio_filebuf<char> * fileBufFromFD (int fd, std::_Ios_Openmode mode)
