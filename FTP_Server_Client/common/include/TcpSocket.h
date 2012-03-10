@@ -19,11 +19,10 @@ using std::ostream;
 class TcpSocket
 {
   public:
-    static const int defaultPort = 8765;
     static const int defaultBackLog = 20;
 
     // Enumerations
-    enum Errrors
+    enum Errors
     {
       None = 0,
       SocketFdErr,
@@ -31,14 +30,14 @@ class TcpSocket
       ListeningErr,
       ConnectErr,
       UnknownError
-    } errorVal;
+    };
 
     
     // Constructor
     TcpSocket ();
 
     // Methods to establish a connection
-    bool connectToHost (const string& host, const int& port = defaultPort);
+    bool connect (const string& host, const int& port);
     int accept ();
     bool bind ();
     bool listen (const int& backLog = defaultBackLog);
@@ -47,6 +46,8 @@ class TcpSocket
     // Sending and receiving data
     void operator >> (string& line);
     void operator << (string& msg );
+
+    Errors getErrorVal () const;
     
   private:
     struct sockaddr_in hostAddr;
@@ -54,6 +55,7 @@ class TcpSocket
     int socketFD;
     istream *sockStreamIn;
     ostream *sockStreamOut;
+    Errors errorVal;
 };
 
 #endif 

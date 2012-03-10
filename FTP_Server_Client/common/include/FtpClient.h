@@ -2,22 +2,23 @@
 #ifndef FTP_CLIENT_INCLUDED
 #define FTP_CLIENT_INCLUDED
 
+#include <TcpSocket.h>
 
-class FtpClient 
+class FtpClient
 {
   public:
-    static const ServerPort = 8765;
     
-    FtpClient ();
-    int connectToHost (const string &host, int port = ServerPort);
+    static const int defaultPort = 8765;
+
+    // Connection-related methods.
+    bool connectToHost (const string& host, const int& port = defaultPort);
+
+    TcpSocket::Errors getErrorVal () const;
 
   private:
-    struct FtpPacket
-    {
-      int code;
-      string arg;
+    string command;
+    TcpSocket dataPort, commandPort;
 
-    };
 };
 
 #endif // End of file

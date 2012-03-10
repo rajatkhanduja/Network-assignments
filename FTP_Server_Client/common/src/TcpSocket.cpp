@@ -46,13 +46,13 @@ TcpSocket::TcpSocket ()
   sockStreamOut = createOutStreamFromFD(socketFD);
 }
 
-bool TcpSocket::connectToHost (const string &host, const int& port)
+bool TcpSocket::connect (const string &host, const int& port)
 {
   hostAddr.sin_port = htons (port);
   
   len = sizeof (hostAddr);    
 
-  return (connect (socketFD, (struct sockaddr*) &hostAddr, len) == 0);
+  return (::connect (socketFD, (struct sockaddr*) &hostAddr, len) == 0);
 }
 
 
@@ -103,3 +103,7 @@ void TcpSocket::operator << (string& msg)
   *sockStreamOut << msg; 
 }
 
+inline TcpSocket::Errors TcpSocket::getErrorVal () const
+{
+  return errorVal;
+}
