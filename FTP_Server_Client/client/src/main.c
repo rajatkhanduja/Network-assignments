@@ -132,7 +132,9 @@ int main (int argc, char *argv[])
   len = sizeof (server_addr);
 
   char test_string[] = "Test packet.\n";
+  test_string[strlen(test_string)] = EOF;
   /* --- */
+
 
  	/* Create a connection to the server */
   if ( connect (socket_fd, (struct sockaddr*) &server_addr, len) < 0 )
@@ -140,8 +142,12 @@ int main (int argc, char *argv[])
     fprintf (stderr, "Could not connect to %s\n", host_addr);
   }
 
-  sendto (socket_fd, test_string, strlen (test_string), 0,
-          (struct sockaddr *) &server_addr, len);
+  send (socket_fd, test_string, strlen (test_string), 0);
 
+  fprintf (stderr, "Sent\n");
+  memset (test_string, 0, strlen(test_string));
+  int t = recv (socket_fd, test_string, 12, 0);
+
+  fprintf (stderr, "%s %d\n", test_string, t);
   return 0;
 }
