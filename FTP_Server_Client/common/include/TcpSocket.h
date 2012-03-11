@@ -19,7 +19,6 @@ using std::ostream;
 class TcpSocket
 {
   public:
-    static const int defaultBackLog = 20;
 
     // Enumerations
     enum Errors
@@ -35,13 +34,15 @@ class TcpSocket
     
     // Constructor
     TcpSocket ();
+    TcpSocket (int socketFD, const TcpSocket& socket);
 
     // Methods to establish a connection
     bool connect (const string& host, const int& port);
     int accept ();
-    bool bind ();
-    bool listen (const int& backLog = defaultBackLog);
-    bool bindAndListen (const int& backLog = defaultBackLog);
+    bool bind (const int& port = 0);
+    bool listen (const int& backLog);
+    bool bindAndListen (const int& backLog, const int& port = 0);
+    bool close ();
 
     // Sending and receiving data
     void operator >> (string& line);
@@ -56,6 +57,8 @@ class TcpSocket
     istream *sockStreamIn;
     ostream *sockStreamOut;
     Errors errorVal;
+
+    int setupSocket (int socketFD = 0);
 };
 
 #endif 

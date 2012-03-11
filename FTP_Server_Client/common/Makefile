@@ -2,7 +2,7 @@ SRC = src
 OBJ = obj
 CC  = g++
 CFLAGS = -Iinclude/
-OBJECTS = $(OBJ)/TcpSocket.o $(OBJ)/FtpClient.o
+OBJECTS = $(OBJ)/TcpSocket.o $(OBJ)/FtpClient.o $(OBJ)/FtpServer.o
 
 all: $(OBJECTS)
 
