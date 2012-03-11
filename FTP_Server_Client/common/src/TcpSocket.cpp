@@ -143,17 +143,12 @@ int TcpSocket::accept ()
   return ( :: accept (socketFD, (struct sockaddr*) &hostAddr, &len) );
 }
 
-void TcpSocket::operator >> (string &line)
+bool TcpSocket::operator >> (string &line)
 {
   std::getline (*sockStreamIn, line, (char) (EOF));
-}
+  sockStreamIn->clear();
 
-void test()
-{
-  TcpSocket socket;
-  string t;
-  socket >> t; 
-  socket << t;
+  return (line.length());
 }
 
 void TcpSocket::operator << (const string& msg)

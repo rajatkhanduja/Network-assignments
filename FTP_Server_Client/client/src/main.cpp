@@ -92,8 +92,10 @@ int main (int argc, char* argv[])
   
   FtpClient client;
 
-  std::cerr << client.connectToHost(hostAddr, port);
-  std::cerr << client.getErrorVal() << std::endl;
+  if ( client.connectToHost(hostAddr, port) )
+  {
+    client.dir("/home/rajat/");
+  }
   
   return 0;
 }

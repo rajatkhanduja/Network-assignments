@@ -32,15 +32,14 @@ void FtpServer::serve ()
   string msg, reply;
   int command;  
     
-  while ( 1 )
+  while ( *listenSocket >> msg )
   {
     // Recieve the command.
-    *listenSocket >> msg;
-    
-    std::cerr << msg;
 
     command = msg[0];
-    msg.erase (0);
+    msg.erase (0,1);
+
+    std::cerr << "Received : " << msg;
 
     /* This part is heavily dependent on the assumption/understanding
      * that the first character contains the command (explained in 

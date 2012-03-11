@@ -4,18 +4,7 @@
 
 bool FtpClient::connectToHost (const string& host, const int& port)
 {
-//  return commandPort.connect (host, port);
-  if (commandPort.connect (host, port))
-  {
-    string test("test message\n");
-    commandPort << test;
-   
-    // Wait for reply
-    commandPort >> test;
-    std::cerr << test;
-    return true;
-  }
-  else return false;
+  return (commandPort.connect (host, port));
 }
 
 TcpSocket::Errors FtpClient::getErrorVal () const
@@ -27,17 +16,23 @@ TcpSocket::Errors FtpClient::getErrorVal () const
  * Need to receive appropriate responses and get data.
  */
 
-bool FtpClient::dir (const string& dir)
+list<string> FtpClient::dir (const string& dir)
 {
   command += (char) Ftp::Dir;
   command += dir;
   commandPort << command;
+
+  string reply;
+  commandPort >> reply;
+  std::cerr << (int) reply[0];
+
+  std::cerr << "Done with the reply\n";
 }
 
 bool FtpClient::getFile (const string& file)
 {
-  command += (char)Ftp::Get;
   command += file;
+  command.insert (0, 1, (char) Ftp::Get);
   commandPort << command;
 }
 
