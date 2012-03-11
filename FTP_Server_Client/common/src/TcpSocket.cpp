@@ -107,20 +107,24 @@ inline bool TcpSocket::bind (const int& port)
 {
   hostAddr.sin_port = htons(port);
   hostAddr.sin_addr.s_addr = htonl (INADDR_ANY);
-  return ( :: bind (socketFD, (struct sockaddr*) &hostAddr, len) == 0);
+  len = sizeof (hostAddr);
+  return ( (:: bind (socketFD, (struct sockaddr*) &hostAddr, len) )== 0);
 }
 
 inline bool TcpSocket::listen (const int& backLog)
 {
   return ( :: listen (socketFD, backLog) == 0 );
 }
+#include <stdio.h>
+#include <errno.h>
 
-
-bool TcpSocket::bindAndListen (const int& backLog, const int& port)
+bool TcpSocket::bindAndListen (const int& port, const int& backLog)
 {
   
+  fprintf (stderr, "%d\n", port);
   if ( ! this->bind(port) )
   {
+    perror ("bind");
     errorVal = SocketBindErr;
     return false;
   }
@@ -141,7 +145,7 @@ int TcpSocket::accept ()
 
 void TcpSocket::operator >> (string &line)
 {
-  std::getline (*sockStreamIn, line, (char) EOF);
+  std::getline (*sockStreamIn, line, (char) (EOF));
 }
 
 void test()
@@ -155,6 +159,8 @@ void test()
 void TcpSocket::operator << (string& msg)
 {
   *sockStreamOut << msg; 
+  *sockStreamOut << (char) (EOF);
+  sockStreamOut->flush();
 }
 
 TcpSocket::Errors TcpSocket::getErrorVal () const

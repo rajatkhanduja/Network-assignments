@@ -43,7 +43,7 @@ class TcpSocket
     int accept ();
     bool bind (const int& port = 0);
     bool listen (const int& backLog);
-    bool bindAndListen (const int& backLog, const int& port = 0);
+    bool bindAndListen (const int& port, const int& backLog);
     bool close ();
 
     // Sending and receiving data

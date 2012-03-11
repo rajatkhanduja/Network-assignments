@@ -22,8 +22,6 @@ using std::cerr;
 using std::cin ;
 using std::ifstream;
 
-
-
 void usage (char *progName)
 {
   cerr << "Usage:-\n" << progName <<" -a HOST_ADDRESS [-f FILE] [-p PORT] [-v]\n";
@@ -96,7 +94,6 @@ int main (int argc, char* argv[])
 
   std::cerr << client.connectToHost(hostAddr, port);
   std::cerr << client.getErrorVal() << std::endl;
-
-
+  
   return 0;
 }

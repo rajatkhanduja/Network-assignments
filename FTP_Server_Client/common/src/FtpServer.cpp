@@ -20,6 +20,14 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
 {
   listenSocket = new TcpSocket (socketFD, *(server.listenSocket));
   dataSocket = NULL;
+
+  string tmp;
+  *listenSocket >> tmp;
+  
+  std::cerr << tmp << std::endl;
+  tmp = "new message\n";
+
+  *listenSocket << tmp;
 }
 
 FtpServer * FtpServer::accept ()

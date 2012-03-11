@@ -14,7 +14,6 @@ class FtpServer
     FtpServer (int port = 0, const int& queueLength = Ftp::defaultBackLog); 
     FtpServer (int socketFd, const FtpServer& server);
 
-    
     FtpServer * accept ();
     int getCommandErrorVal() const;
     int getDataErrorVal() const;

@@ -4,7 +4,18 @@
 
 bool FtpClient::connectToHost (const string& host, const int& port)
 {
-  return commandPort.connect (host, port);
+//  return commandPort.connect (host, port);
+  if (commandPort.connect (host, port))
+  {
+    string test("test message\n");
+    commandPort << test;
+   
+    // Wait for reply
+    commandPort >> test;
+    std::cerr << test;
+    return true;
+  }
+  else return false;
 }
 
 TcpSocket::Errors FtpClient::getErrorVal () const
