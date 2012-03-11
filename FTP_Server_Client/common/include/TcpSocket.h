@@ -48,7 +48,7 @@ class TcpSocket
 
     // Sending and receiving data
     void operator >> (string& line);
-    void operator << (string& msg );
+    void operator << (const string& msg );
 
     Errors getErrorVal () const;
     string getError () const;

@@ -21,13 +21,53 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
   listenSocket = new TcpSocket (socketFD, *(server.listenSocket));
   dataSocket = NULL;
 
-  string tmp;
-  *listenSocket >> tmp;
-  
-  std::cerr << tmp << std::endl;
-  tmp = "new message\n";
+}
 
-  *listenSocket << tmp;
+/* Function to let the newly spawned FtpServer object (after the accept 
+ * method) to serve the client.
+ * This separation from the main class facilitates multithreading.
+ */
+void FtpServer::serve ()
+{
+  string msg, reply;
+  int command;  
+    
+  while ( 1 )
+  {
+    // Recieve the command.
+    *listenSocket >> msg;
+    
+    std::cerr << msg;
+
+    command = msg[0];
+    msg.erase (0);
+
+    /* This part is heavily dependent on the assumption/understanding
+     * that the first character contains the command (explained in 
+     * "Ftp.h").
+     */
+    if ( Ftp::isValidCommand (command))
+    {
+      // Correct command. Send 'accept'.
+      std::cerr << "Correct command " << command << std::endl;
+      reply = (char) Ftp::Accept;
+      *listenSocket << reply;
+    }
+    else
+    {
+      // Send a Reject.
+      std::cerr << "Incorrect command\n";
+      reply = (char) Ftp::InvalidCommand;
+      *listenSocket << reply;
+    }
+    
+    std::cerr << "Replied\n";
+    // Reply appropriately.
+//    *dataSocket << reply;    
+  
+    msg.clear ();
+    reply.clear ();
+  }
 }
 
 FtpServer * FtpServer::accept ()

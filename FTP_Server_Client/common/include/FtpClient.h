@@ -29,6 +29,9 @@ class FtpClient
     // List local directory
     list<string> listLocalDir (const string& dir = string(), const bool& recursive = false);
 
+    // List files
+    bool dir (const string& dir = string());
+
     // Fetch file(s)
     bool getFile  (const string& file);
     bool getFiles (const list<string>& files = list<string>());

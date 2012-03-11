@@ -15,6 +15,9 @@ class FtpServer
     FtpServer (int socketFd, const FtpServer& server);
 
     FtpServer * accept ();
+    
+    void serve ();
+
     int getCommandErrorVal() const;
     int getDataErrorVal() const;
 

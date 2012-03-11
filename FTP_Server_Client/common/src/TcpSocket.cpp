@@ -156,7 +156,7 @@ void test()
   socket << t;
 }
 
-void TcpSocket::operator << (string& msg)
+void TcpSocket::operator << (const string& msg)
 {
   *sockStreamOut << msg; 
   *sockStreamOut << (char) (EOF);
