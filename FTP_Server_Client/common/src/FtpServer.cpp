@@ -14,3 +14,12 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
   listenSocket = new TcpSocket (socketFD, *(server.listenSocket));
   dataSocket = NULL;
 }
+
+FtpServer * FtpServer::accept ()
+{
+  int newSocket;
+  if ((newSocket = listenSocket->accept ()) != -1)
+  {
+    return (new FtpServer (newSocket, *this));
+  }
+}

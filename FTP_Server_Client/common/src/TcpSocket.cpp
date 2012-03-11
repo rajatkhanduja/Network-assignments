@@ -109,6 +109,11 @@ bool TcpSocket::bindAndListen (const int& backLog, const int& port)
   return true;
 }
 
+int TcpSocket::accept ()
+{
+  return ( :: accept (socketFD, (struct sockaddr*) &hostAddr, &len) );
+}
+
 void TcpSocket::operator >> (string &line)
 {
   std::getline (*sockStreamIn, line, (char) EOF);
@@ -127,7 +132,7 @@ void TcpSocket::operator << (string& msg)
   *sockStreamOut << msg; 
 }
 
-inline TcpSocket::Errors TcpSocket::getErrorVal () const
+TcpSocket::Errors TcpSocket::getErrorVal () const
 {
   return errorVal;
 }

@@ -2,6 +2,7 @@
 *.out
 .*.swp
 .*.swo
+*.a
 Assignment1
 Assignment3
 *.gch

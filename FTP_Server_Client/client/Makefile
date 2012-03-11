@@ -2,13 +2,13 @@ SRC = src
 OBJ = obj
 BIN = bin
 COMMON = ../common
-COMMON_OBJ = $(COMMON)/obj
+COMMON_LIB = $(COMMON)/obj/FtpServerClient.a
 CC = g++
 CFLAGS = -I../common/include -Iinclude/
-OBJECTS = ${COMMON_OBJ}/FtpClient.o ${OBJ}/main.o
+OBJECTS = ${OBJ}/main.o
 
 all: common ${OBJECTS}
-	${CC} $^ -o ${BIN}/client
+	${CC} $(COMMON_LIB) $(OBJECTS) -o ${BIN}/client
   
 ${OBJ}/%.o : ${SRC}/%.cpp
 	${CC} -c -g ${CFLAGS} $< -o $@
