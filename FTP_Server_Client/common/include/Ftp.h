@@ -21,6 +21,8 @@ namespace Ftp
 		Put,
 		MPut,
 		Dir,
+		Terminate,
+		PortVal,
 		CommandEnd
 	};
 

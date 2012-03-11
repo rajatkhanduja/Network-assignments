@@ -102,19 +102,7 @@ bool TcpSocket::connect (const string &host, const int& port)
 }
 
 
-/* Inline these functions */
-inline bool TcpSocket::bind (const int& port)
-{
-  hostAddr.sin_port = htons(port);
-  hostAddr.sin_addr.s_addr = htonl (INADDR_ANY);
-  len = sizeof (hostAddr);
-  return ( (:: bind (socketFD, (struct sockaddr*) &hostAddr, len) )== 0);
-}
-
-inline bool TcpSocket::listen (const int& backLog)
-{
-  return ( :: listen (socketFD, backLog) == 0 );
-}
+/* TODO : REMOVE THESE */
 #include <stdio.h>
 #include <errno.h>
 
@@ -157,23 +145,7 @@ void TcpSocket::operator << (const string& msg)
   sockStreamOut->flush();
 }
 
-TcpSocket::Errors TcpSocket::getErrorVal () const
-{
-  return errorVal;
-}
 
-inline bool TcpSocket::close()
-{
-  if (::close (socketFD) < 0)
-  {
-    return false;
-  }
-  else
-  {
-    socketFD = 0;
-    return true;
-  }
-}
 
 string TcpSocket::getError() const
 {
@@ -189,4 +161,5 @@ string TcpSocket::getError() const
     default             : return string("Unknown Error");
   }
 }
+
 

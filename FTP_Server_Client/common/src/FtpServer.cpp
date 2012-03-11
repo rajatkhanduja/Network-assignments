@@ -3,6 +3,9 @@
 #include <FtpServer.h>
 #include <cstdio>
 #include <errno.h>
+#include <sstream>
+
+using std::stringstream;
 
 FtpServer::FtpServer (int port, const int& queueLength)
 {
@@ -29,7 +32,7 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
  */
 void FtpServer::serve ()
 {
-  string msg, reply;
+  string msg, reply, tmp;
   int command;  
     
   while ( *listenSocket >> msg )
@@ -60,10 +63,56 @@ void FtpServer::serve ()
       *listenSocket << reply;
     }
     
-    std::cerr << "Replied\n";
+    if ( command == Ftp::Terminate)
+    {
+      break;
+    }
+
+    // Create the necessary data socket.
+    dataSocket = new TcpSocket();
+    
+    if( !dataSocket )
+    {
+      throw "Couldn't open dataSocket\n";
+    }
+    dataSocket->bind();
+
+    std::cerr << "Opened dataSocket\n" << std::endl;
+
+    // Send the port number for the dataSocket.
+    stringstream portString;
+    portString << dataSocket->port();
+    portString >> tmp;
+    std::cerr << dataSocket->port() << " " << tmp << std::endl;
+    reply.clear();
+    reply += (char) Ftp::PortVal;
+    reply += tmp;
+    *listenSocket << reply;
+
+    // Wait for confirmation (Accept)
+    *listenSocket >> tmp;
+
+    if ( (int) tmp[0] != Ftp::Accept)
+    {
+      throw "Unexpected Response received.\n";
+    }
+
+    /* Call appropriate functions to handle the command */
+    reply = "ABC DEF";
+
+    std::cerr << "Waiting for request on data socket..." << std::endl;
+
     // Reply appropriately.
-//    *dataSocket << reply;    
-  
+    dataSocket->accept();
+
+    std::cerr << "Sending data : " << std::endl;
+    *dataSocket << reply;
+
+    if (command == Ftp::Terminate)
+    {
+      return;
+    }
+    
     msg.clear ();
     reply.clear ();
   }

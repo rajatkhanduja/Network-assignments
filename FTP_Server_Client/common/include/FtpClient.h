@@ -13,9 +13,6 @@ using std::string;
 class FtpClient
 {
   public:
-    enum Errors
-    {
-    };
 
     // Connection-related methods.
     bool connectToHost (const string& host, const int& port);
@@ -40,10 +37,14 @@ class FtpClient
     bool putFile  (const string& file);
     bool putFiles (const list<string>& files = list<string>());
 
+    // Terminate connection
+    bool terminate ();
+
   private:
     string command;
     string localDir;
     string remoteDir;
+    string host;
     TcpSocket dataPort, commandPort;
 
 };

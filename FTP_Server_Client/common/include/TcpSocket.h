@@ -46,6 +46,8 @@ class TcpSocket
     bool bindAndListen (const int& port, const int& backLog);
     bool close ();
 
+    int port () const;
+    
     // Sending and receiving data
     bool operator >> (string& line);
     void operator << (const string& msg );
@@ -63,5 +65,52 @@ class TcpSocket
 
     int setupSocket (int socketFD = 0);
 };
+
+inline int TcpSocket::port () const
+{
+  return ntohs(hostAddr.sin_port);
+}
+
+inline bool TcpSocket::close()
+{
+  if (::close (socketFD) < 0)
+  {
+    return false;
+  }
+  else
+  {
+    socketFD = 0;
+    return true;
+  }
+}
+
+inline TcpSocket::Errors TcpSocket::getErrorVal () const
+{
+  return errorVal;
+}
+
+inline bool TcpSocket::listen (const int& backLog)
+{
+  return ( :: listen (socketFD, backLog) == 0 );
+}
+
+inline bool TcpSocket::bind (const int& port)
+{
+  hostAddr.sin_port = htons(port);
+  hostAddr.sin_addr.s_addr = htonl (INADDR_ANY);
+  len = sizeof (hostAddr);
+  if ( (:: bind (socketFD, (struct sockaddr*) &hostAddr, len) )== 0)
+  {
+    if ( port == 0)
+    {
+      getsockname (socketFD, (struct sockaddr*) &hostAddr, &len);
+    }
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
 
 #endif 
