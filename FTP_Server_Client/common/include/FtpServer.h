@@ -3,18 +3,21 @@
 #define FTP_SERVER_INCLUDED
 
 #include <TcpSocket.h>
+#include <Ftp.h>
 
 class FtpServer
 {
   public:
-    static const int defaultBackLog = 20;
-    
     // Constructor
-    FtpServer (int port = 0, const int& queueLength = defaultBackLog); // Sets up a server lisening to port with queue length
+    
+    // Sets up a server lisening to port with queue length
+    FtpServer (int port = 0, const int& queueLength = Ftp::defaultBackLog); 
     FtpServer (int socketFd, const FtpServer& server);
 
     
     FtpServer * accept ();
+    int getCommandErrorVal() const;
+    int getDataErrorVal() const;
 
   private:
     TcpSocket *listenSocket;

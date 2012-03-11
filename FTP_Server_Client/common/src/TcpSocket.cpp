@@ -4,6 +4,8 @@
 #include <cstring>
 #include <ext/stdio_filebuf.h>
 #include <cassert>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 using __gnu_cxx::stdio_filebuf;
 
@@ -69,12 +71,34 @@ TcpSocket::TcpSocket (int socketFD, const TcpSocket& socket)
 
 
 bool TcpSocket::connect (const string &host, const int& port)
-{
-  hostAddr.sin_port = htons (port);
+{ 
+  char isHostAddrSet = inet_pton (AF_INET, host.c_str(), &hostAddr.sin_addr);
+ 
+  if (isHostAddrSet == 0)
+  {
+    errorVal = InvalidAddr;
+    return false;
+  }
+              
+  if (isHostAddrSet == -1)
+  {
+    errorVal = UnsupportedAddr;
+    return false;
+  }
   
+  hostAddr.sin_port = htons (port);
+    
   len = sizeof (hostAddr);    
 
-  return (::connect (socketFD, (struct sockaddr*) &hostAddr, len) == 0);
+  if  (::connect (socketFD, (struct sockaddr*) &hostAddr, len) != 0)
+  {
+    errorVal = ConnectErr;
+    return false;
+  }
+  else
+  {
+    return true;
+  }
 }
 
 
@@ -82,6 +106,7 @@ bool TcpSocket::connect (const string &host, const int& port)
 inline bool TcpSocket::bind (const int& port)
 {
   hostAddr.sin_port = htons(port);
+  hostAddr.sin_addr.s_addr = htonl (INADDR_ANY);
   return ( :: bind (socketFD, (struct sockaddr*) &hostAddr, len) == 0);
 }
 
@@ -149,3 +174,19 @@ inline bool TcpSocket::close()
     return true;
   }
 }
+
+string TcpSocket::getError() const
+{
+  switch (errorVal)
+  {
+    case None           : return string("None");
+    case SocketFdErr    : return string("Socket File-descriptor Error");
+    case SocketBindErr  : return string("Socket Binding Error");
+    case ListeningErr   : return string("Error listening");
+    case InvalidAddr    : return string("Invalid host address");
+    case UnsupportedAddr: return string("Unsupported host address");
+    case ConnectErr     : return string("Connecting error");
+    default             : return string("Unknown Error");
+  }
+}
+

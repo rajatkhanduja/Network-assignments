@@ -4,11 +4,11 @@ BIN = bin
 COMMON = ../common
 COMMON_LIB = $(COMMON)/obj/FtpServerClient.a
 CC = g++
-CFLAGS = -I../common/include -Iinclude/
+CFLAGS = -I$(COMMON)/include -Iinclude/ -I$(COMMON)
 OBJECTS = ${OBJ}/main.o
 
 all: common ${OBJECTS}
-	${CC} $(COMMON_LIB) $(OBJECTS) -o ${BIN}/client
+	${CC} $(OBJECTS) $(COMMON_LIB) -o ${BIN}/client
   
 ${OBJ}/%.o : ${SRC}/%.cpp
 	${CC} -c -g ${CFLAGS} $< -o $@

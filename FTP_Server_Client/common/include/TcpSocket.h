@@ -27,6 +27,8 @@ class TcpSocket
       SocketFdErr,
       SocketBindErr,
       ListeningErr,
+      InvalidAddr,
+      UnsupportedAddr,
       ConnectErr,
       UnknownError
     };
@@ -49,6 +51,7 @@ class TcpSocket
     void operator << (string& msg );
 
     Errors getErrorVal () const;
+    string getError () const;
     
   private:
     struct sockaddr_in hostAddr;

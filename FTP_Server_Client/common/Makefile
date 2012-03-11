@@ -12,8 +12,8 @@ $(OBJ)/%.o : $(SRC)/%.cpp
 	$(CC) -c -g $(CFLAGS) $< -o $@
 
 libServerClient: $(OBJECTS)
-	$(AR) cr $(LIB_OBJ) $(OBJECTS) 
+	$(AR) crs $(LIB_OBJ) $(OBJECTS) 
 
 clean:
-	rm -f $(OBJ)/*.o
+	rm -f $(OBJ)/*
 

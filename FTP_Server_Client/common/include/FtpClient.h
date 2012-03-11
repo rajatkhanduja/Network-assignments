@@ -3,6 +3,7 @@
 #define FTP_CLIENT_INCLUDED
 
 #include <TcpSocket.h>
+#include <Ftp.h>
 #include <string>
 #include <list>
 

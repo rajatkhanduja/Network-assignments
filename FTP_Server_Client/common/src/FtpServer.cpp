@@ -1,11 +1,18 @@
 /* This file defines the functions for the FtpServer Class and its methods. */
 
 #include <FtpServer.h>
+#include <cstdio>
+#include <errno.h>
 
 FtpServer::FtpServer (int port, const int& queueLength)
 {
   listenSocket = new TcpSocket();
-  listenSocket->bindAndListen (port, queueLength);
+  fprintf (stderr, "%d\n", port);
+  if (! listenSocket->bindAndListen (port, queueLength))
+  {
+    perror ("bindAndListen");
+    throw listenSocket->getError();
+  }
   dataSocket = NULL;
 }
 
@@ -22,4 +29,21 @@ FtpServer * FtpServer::accept ()
   {
     return (new FtpServer (newSocket, *this));
   }
+  else
+  {
+    return NULL;
+  }
+}
+
+int FtpServer::getDataErrorVal () const
+{
+  if ( !dataSocket ) 
+    return dataSocket->getErrorVal();
+  else
+    return -1;
+}
+
+int FtpServer::getCommandErrorVal () const
+{
+  return listenSocket->getErrorVal();
 }
