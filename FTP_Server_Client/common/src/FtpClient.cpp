@@ -27,6 +27,9 @@ list<string> FtpClient::dir (const string& dir)
   std::cerr << (int) reply[0];
 
   std::cerr << "Done with the reply\n";
+  
+  list<string> response;
+  return response;
 }
 
 bool FtpClient::getFile (const string& file)

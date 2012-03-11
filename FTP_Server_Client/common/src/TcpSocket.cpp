@@ -146,7 +146,6 @@ int TcpSocket::accept ()
 bool TcpSocket::operator >> (string &line)
 {
   std::getline (*sockStreamIn, line, (char) (EOF));
-  sockStreamIn->clear();
 
   return (line.length());
 }
