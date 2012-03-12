@@ -95,7 +95,7 @@ int main (int argc, char* argv[])
   if ( client.connectToHost(hostAddr, port) )
   {
     std::cerr << "Connection Established\n";
-    string filename("test");
+    string filename("test.doc");
     client.getFiles (filename);
     client.terminate ();
   }

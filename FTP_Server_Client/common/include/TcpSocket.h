@@ -38,6 +38,9 @@ class TcpSocket
     TcpSocket ();
     TcpSocket (int socketFD, const TcpSocket& socket);
 
+    // Destructor
+    ~TcpSocket();
+
     // Methods to establish a connection
     bool connect (const string& host, const int& port);
     int accept ();

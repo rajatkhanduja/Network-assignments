@@ -69,6 +69,11 @@ TcpSocket::TcpSocket (int socketFD, const TcpSocket& socket)
   setupSocket (socketFD);  
 }
 
+TcpSocket :: ~TcpSocket ()
+{
+  close ();
+}
+
 
 bool TcpSocket::connect (const string &host, const int& port)
 { 
@@ -102,17 +107,11 @@ bool TcpSocket::connect (const string &host, const int& port)
 }
 
 
-/* TODO : REMOVE THESE */
-#include <stdio.h>
-#include <errno.h>
-
 bool TcpSocket::bindAndListen (const int& port, const int& backLog)
 {
   
-  fprintf (stderr, "%d\n", port);
   if ( ! this->bind(port) )
   {
-    perror ("bind");
     errorVal = SocketBindErr;
     return false;
   }
@@ -133,6 +132,10 @@ int TcpSocket::accept ()
 
 bool TcpSocket::operator >> (string &line)
 {
+/*  if ( sockStreamIn->fail() )
+  {
+    return false;
+  } */
   std::getline (*sockStreamIn, line, (char) (EOF));
 
   return (line.length());
@@ -143,6 +146,7 @@ void TcpSocket::operator << (const string& msg)
   *sockStreamOut << msg; 
   *sockStreamOut << (char) (EOF);
   sockStreamOut->flush();
+  std::cerr << "Sent from here\n";
 }
 
 void TcpSocket::operator << (ifstream& file)

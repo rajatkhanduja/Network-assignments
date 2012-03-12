@@ -51,21 +51,36 @@ ifstream * getFileStream (const string& fileName)
 	}
 }
 
-bool replaceSpaces (string& list)
+int replaceSpaces (string& list)
 {
-  int offset = 0;
-  while (list.find_first_of (' ', offset) != string::npos)
+  int offset = 0, count = 0;
+
+  while ( (offset = list.find_first_of (' ', offset)) != string::npos)
   {
-    return true;
+    if ( offset >0 && list[offset-1] != '\\' )    
+    {
+      list[offset] = '\n'; 
+    }
+    offset++;
+    count++;
   }
 
-  return false;
+  return count;
 }
 
 bool putFileStream (const string& filename, const string& data) 
 {
   ofstream file(filename.c_str());
   
-  file << data;
+  if ( file.is_open())
+  {
+    file << data;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+  
 }
 

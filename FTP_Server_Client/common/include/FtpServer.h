@@ -14,6 +14,9 @@ class FtpServer
     FtpServer (int port = 0, const int& queueLength = Ftp::defaultBackLog); 
     FtpServer (int socketFd, const FtpServer& server);
 
+    // Destructor
+//    ~FtpServer();
+
     FtpServer * accept ();
     
     void serve ();
@@ -25,8 +28,8 @@ class FtpServer
     TcpSocket *listenSocket;
     TcpSocket *dataSocket;
 
+    // Private functions.
     TcpSocket * setupDataSocket ();
-
     void handleCommand (const int& command, const string& arg);
 };
 

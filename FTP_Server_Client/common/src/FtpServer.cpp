@@ -28,8 +28,19 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
 {
   listenSocket = new TcpSocket (socketFD, *(server.listenSocket));
   dataSocket = NULL;
+}
+
+/*
+FtpServer::~FtpServer ()
+{
+  if (listenSocket)
+    delete listenSocket;
+
+  if (dataSocket)
+    delete dataSocket;
 
 }
+*/
 
 void FtpServer::handleCommand (const int& command, const string& arg)
 {
@@ -72,6 +83,7 @@ void FtpServer::handleCommand (const int& command, const string& arg)
                 openSocket = setupDataSocket();
                 *openSocket << arg;
                 *openSocket << (*fileStream);
+                fileStream->close();
               }
               else
               {
@@ -194,6 +206,9 @@ void FtpServer::serve ()
     msg.clear ();
     reply.clear ();
   }
+
+//  listenSocket->close();
+  std::cerr << "Time to close this connection\n";
 }
 
 FtpServer * FtpServer::accept ()

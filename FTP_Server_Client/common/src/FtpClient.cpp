@@ -94,7 +94,9 @@ bool FtpClient::getFiles (string& files)
   /* MGet is followed by a list of names, separated by
    * space.
    */
- 
+
+  
+
   string * filename = getData (Ftp::Get, files);
   string * data     = getData ();
 
