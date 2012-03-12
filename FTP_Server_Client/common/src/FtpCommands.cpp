@@ -2,8 +2,10 @@
 #include <dirent.h>
 #include <cstring>
 #include <fstream>
+#include <sstream>
 
-using std::ifstream;
+using std::ofstream;
+using std::stringstream;
 
 string * dir (const string& directory)
 {
@@ -47,4 +49,23 @@ ifstream * getFileStream (const string& fileName)
 	{
 		return NULL;
 	}
-}	
+}
+
+bool replaceSpaces (string& list)
+{
+  int offset = 0;
+  while (list.find_first_of (' ', offset) != string::npos)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+bool putFileStream (const string& filename, const string& data) 
+{
+  ofstream file(filename.c_str());
+  
+  file << data;
+}
+

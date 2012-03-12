@@ -37,31 +37,54 @@ void FtpServer::handleCommand (const int& command, const string& arg)
    * about the socket to the client and waiting for it to connect 
    */
   TcpSocket *openSocket = NULL;
-
+  string *tmp = NULL;
+  
   switch (command)
   {
     case Ftp::Dir : 
-              openSocket = setupDataSocket ();
-              *openSocket << (* dir (arg));
+              tmp = dir(arg);
+              openSocket = setupDataSocket();
+              *openSocket << *tmp;
               break;
 
     case Ftp::ChDir:
+              openSocket = setupDataSocket();
               if ( 0 == chdir (arg.c_str()))
               { 
                 *openSocket << arg;
               }
               else
               {
-                
+                tmp = new string();
+                tmp->clear();
+                *tmp += "Failed :";
+                *tmp += arg; 
+                *tmp += "\n";
+                *openSocket << *tmp;
+                delete tmp;
               }
     
     case Ftp::Get :
-              openSocket = setupDataSocket ();
+              std::cerr << "Getting file " << arg << std::endl;
+              ifstream *fileStream = getFileStream (arg);
+              if ( fileStream)
+              {
+                openSocket = setupDataSocket();
+                *openSocket << arg;
+                *openSocket << (*fileStream);
+              }
+              else
+              {
+                tmp   = new string();
+                (*tmp) += (char) Ftp::InvalidArg;
+                *listenSocket << *tmp;
+              }
               break;
   }
 
   if ( openSocket )
   {
+    std::cerr << "Sent Data. Closing dataSocket" << std::endl;
     openSocket->close();
     dataSocket->close();
   }
@@ -167,7 +190,6 @@ void FtpServer::serve ()
     /* Call appropriate functions to handle the command */
     handleCommand (command, msg);
 
-    std::cerr << "Sent Data. Closing dataSocket" << std::endl;
 
     msg.clear ();
     reply.clear ();

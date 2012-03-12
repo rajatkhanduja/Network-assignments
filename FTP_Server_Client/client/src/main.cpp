@@ -95,7 +95,8 @@ int main (int argc, char* argv[])
   if ( client.connectToHost(hostAddr, port) )
   {
     std::cerr << "Connection Established\n";
-    std::cerr << client.listLocalDir("/home/rajat/");
+    string filename("test");
+    client.getFiles (filename);
     client.terminate ();
   }
   

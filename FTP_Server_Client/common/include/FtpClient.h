@@ -13,8 +13,11 @@ using std::string;
 class FtpClient
 {
   public:
+ 
+    static const char * defaultDir;
     
-  
+    FtpClient ();
+
     // Connection-related methods.
     bool connectToHost (const string& host, const int& port);
 
@@ -27,13 +30,16 @@ class FtpClient
     // List local directory
     string listLocalDir (const string& dir = string(), const bool& recursive = false);
 
+    // Change directory.
+    string changeDir (const string &dir);
+    string changeLocalDir (const string &dir);
+
     // Fetch file(s)
-    bool getFile  (const string& file);
-    bool getFiles (const list<string>& files = list<string>());
+    bool getFiles (string& files);
 
     // Put file(s)
     bool putFile  (const string& file);
-    bool putFiles (const list<string>& files = list<string>());
+    bool putFiles (const string& files);
 
     // Terminate connection
     bool terminate ();
@@ -46,6 +52,7 @@ class FtpClient
     TcpSocket dataPort, commandPort;
 
     string * getData (Ftp::CommandCodes code, const string& arg);
+    string * getData ();  // This assumes the dataPort is already connected.
 };
 
 #endif // End of file

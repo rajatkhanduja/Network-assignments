@@ -1,3 +1,7 @@
+#include <string>
+
+using std::string;
+
 namespace Ftp
 {
   const int defaultPort    = 8765;
@@ -32,12 +36,18 @@ namespace Ftp
     Accept = 1,
     InvalidCommand,
     TempReject,
-    PermReject
+    PermReject,
+    InvalidArg      /* Use in cases where the command is correct but the argument is incorrect. 
+                     * For instance, a file that does not exist or cannot be opened.
+                     */
   };
 
 	inline bool isValidCommand (int command)
 	{
 		return ( (command >= CommandStart && command <= CommandEnd ));
 	}
+
+  string response (int received);
+
 }
 

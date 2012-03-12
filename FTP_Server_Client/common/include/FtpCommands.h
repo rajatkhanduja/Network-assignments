@@ -14,5 +14,9 @@ using std::ifstream;
 
 string * dir (const string& directory);
 ifstream * getFileStream (const string& fileName);
+bool putFileStream (const string& filename, const string& data);
+
+// Auxillary functions
+bool replaceSpaces (string& list);    // True if replacements occur.
 
 #endif	// End of file
