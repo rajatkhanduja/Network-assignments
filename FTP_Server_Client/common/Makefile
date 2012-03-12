@@ -4,7 +4,7 @@ CC  = g++
 CFLAGS = -Iinclude/
 AR = ar
 LIB_OBJ = $(OBJ)/FtpServerClient.a
-OBJECTS = $(OBJ)/TcpSocket.o $(OBJ)/FtpClient.o $(OBJ)/FtpServer.o $(OBJ)/FtpServerCommands.o
+OBJECTS = $(OBJ)/TcpSocket.o $(OBJ)/FtpClient.o $(OBJ)/FtpServer.o $(OBJ)/FtpCommands.o
 
 all: libServerClient
 

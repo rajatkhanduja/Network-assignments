@@ -8,12 +8,12 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <iostream>
-
-
+#include <fstream>
 #include <string>
 
 using std::string;
 using std::istream;
+using std::ifstream;
 using std::ostream;
 
 class TcpSocket
@@ -51,6 +51,7 @@ class TcpSocket
     // Sending and receiving data
     bool operator >> (string& line);
     void operator << (const string& msg );
+    void operator << (ifstream& file);
 
     Errors getErrorVal () const;
     string getError () const;

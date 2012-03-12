@@ -21,13 +21,10 @@ class FtpClient
 
     /* FTP commands */
     // List directory
-    list<string> listDir (const string& dir = string(), const bool& recursive = false);
+    string listDir (const string& dir = string(), const bool& recursive = false);
 
     // List local directory
-    list<string> listLocalDir (const string& dir = string(), const bool& recursive = false);
-
-    // List files
-    list<string> dir (const string& dir = string());
+    string listLocalDir (const string& dir = string(), const bool& recursive = false);
 
     // Fetch file(s)
     bool getFile  (const string& file);
@@ -47,6 +44,7 @@ class FtpClient
     string host;
     TcpSocket dataPort, commandPort;
 
+    string * getData (Ftp::CommandCodes code, const string& arg);
 };
 
 #endif // End of file

@@ -145,6 +145,13 @@ void TcpSocket::operator << (const string& msg)
   sockStreamOut->flush();
 }
 
+void TcpSocket::operator << (ifstream& file)
+{
+  string content;
+  getline (file, content, (char) EOF);
+
+  (*this) << content;
+}
 
 
 string TcpSocket::getError() const

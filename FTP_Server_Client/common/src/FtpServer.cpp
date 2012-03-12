@@ -4,9 +4,11 @@
 #include <cstdio>
 #include <errno.h>
 #include <sstream>
-#include <FtpServerCommands.h>
+#include <FtpCommands.h>
+#include <fstream>
 
 using std::stringstream;
+using std::ifstream;
 
 FtpServer::FtpServer (int port, const int& queueLength)
 {
@@ -33,6 +35,10 @@ void FtpServer::handleCommand (const int& command, const string& arg, TcpSocket 
   {
     case Ftp::Dir : 
               *openSocket << (* dir (arg));
+              break;
+
+    case Ftp::Get :
+               break;
   }
   return;
 }
@@ -53,13 +59,18 @@ TcpSocket * FtpServer::setupDataSocket ()
 
     std::cerr << "Opened dataSocket\n" << std::endl;
 
-    // Send the port number for the dataSocket.
+    /* Send the port number for the dataSocket. */
+
+    // Convert port number to string.
     stringstream portString;
     portString << dataSocket->port();
     portString >> tmp;
+
     std::cerr << dataSocket->port() << " " << tmp << std::endl;
+    
     portMsg += (char) Ftp::PortVal;
     portMsg += tmp;
+    
     *listenSocket << portMsg;
 
     // Wait for confirmation (Accept)
@@ -88,7 +99,7 @@ void FtpServer::serve ()
 {
   string msg, reply, tmp;
   int command;  
-    
+  std::cerr << "Serving\n";  
   while ( *listenSocket >> msg )
   {
     // Recieve the command.
@@ -123,26 +134,19 @@ void FtpServer::serve ()
       break;
     }
 
+    /* Set up the datasocket. This includes sending information
+     * about the socket to the client and waiting for it to connect 
+     */
     TcpSocket *attachedDataSocket = setupDataSocket ();
 
-    std::cerr << "Processing command" << std::endl;
     /* Call appropriate functions to handle the command */
     handleCommand (command, msg, attachedDataSocket);
-
-    
-//    *attachedDataSocket << reply;
 
     std::cerr << "Sent Data. Closing dataSocket" << std::endl;
 
     attachedDataSocket->close();
     dataSocket->close();
 
-
-    if (command == Ftp::Terminate)
-    {
-      return;
-    }
-    
     msg.clear ();
     reply.clear ();
   }

@@ -14,39 +14,84 @@ TcpSocket::Errors FtpClient::getErrorVal () const
   return commandPort.getErrorVal();
 }
 
+bool isCorrectResponse (int received, int expected)
+{
+  if ( received == expected )
+  {
+    return true;
+  }
+
+  switch ( received )
+  {
+    case Ftp::PermReject :
+            throw string ("Server refusing connection.\n");
+            return false;
+
+    case Ftp::TempReject:
+            throw string ("Server temporarily refusion connection. Try later.\n");
+            return false;
+
+    case Ftp::InvalidCommand:
+            throw string ("Invalid Command\n");
+            return false;
+    default :
+            throw string ("Unexpected response\n");
+            return false;
+  }
+}
+
 /* TODO : right now, only message/command is being sent,
  * Need to receive appropriate responses and get data.
  */
 
-list<string> FtpClient::dir (const string& dir)
+string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
 {
-  command += (char) Ftp::Dir;
-  command += dir;
+  string command, reply, tmp;
+  string *finalReply;
+
+  // Send command
+  command += (char) code;
+  command += arg;
   commandPort << command;
 
-  string reply, tmp;
+  // Wait for the reply.
   commandPort >> reply;
-  std::cerr << (int) reply[0];
+
+  if ( ! isCorrectResponse (reply[0], Ftp::Accept))
+  {
+    return (new string());
+  }
+  
 
   // Listen for data port number
   commandPort >> reply;
-  if ( reply[0] == Ftp::PortVal )
+
+  if ( ! isCorrectResponse (reply[0], Ftp::PortVal) )
   {
-    reply.erase (0,1);
-    tmp.clear();
-    tmp += (char) Ftp::Accept;
-    commandPort << tmp; 
+    return (new string());
+  }
+  reply.erase (0,1);
+  tmp.clear();
+  tmp += (char) Ftp::Accept;
+  commandPort << tmp; 
 
-    dataPort.connect (host, strtol (reply.c_str(), 0, 0));
+  dataPort.connect (host, strtol (reply.c_str(), 0, 0));
 
-    dataPort >> reply;
+  finalReply = new string();
+  dataPort >> *finalReply;
       
     
-    std::cerr << "Received : "<< reply << std::endl;
-    
-    list<string> response;
-    return response;
-  }
+  std::cerr << "Received : "<< reply << std::endl;
+   
+  return finalReply;
+  
+}
+
+string FtpClient::listDir (const string& dir, const bool& recursive)
+{
+  string * reply = getData (Ftp::Dir, dir);
+  
+  return *reply;
 }
 
 bool FtpClient::getFile (const string& file)
@@ -54,6 +99,8 @@ bool FtpClient::getFile (const string& file)
   command += file;
   command.insert (0, 1, (char) Ftp::Get);
   commandPort << command;
+
+  return true;
 }
 
 bool FtpClient::getFiles (const list<string>& files)

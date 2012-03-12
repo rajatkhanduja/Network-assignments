@@ -1,7 +1,9 @@
-#include <FtpServerCommands.h>
-
+#include <FtpCommands.h>
 #include <dirent.h>
 #include <cstring>
+#include <fstream>
+
+using std::ifstream;
 
 string * dir (const string& directory)
 {
@@ -11,6 +13,8 @@ string * dir (const string& directory)
 
 	if ( (dfd = opendir (directory.c_str())) == NULL )
 	{
+		*response += "Can't open directory : ";
+		*response += directory;
 		return response;
 	}
 
@@ -22,7 +26,7 @@ string * dir (const string& directory)
 			continue;
 		}
 		
-		(*response) += " ";
+		(*response) += "\n";
 		(*response) += dp->d_name;
 	}
 
@@ -30,3 +34,17 @@ string * dir (const string& directory)
 
 	return response;
 }
+
+ifstream * getFile (const string& fileName)
+{
+	ifstream * fileRead = new ifstream (fileName.c_str());
+
+	if ( fileRead->is_open ())
+	{
+		return fileRead;
+	}
+	else
+	{
+		return NULL;
+	}
+}	
