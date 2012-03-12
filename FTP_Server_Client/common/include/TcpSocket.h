@@ -55,6 +55,7 @@ class TcpSocket
     bool operator >> (string& line);
     void operator << (const string& msg );
     void operator << (ifstream& file);
+    int peek () const;
 
     Errors getErrorVal () const;
     string getError () const;
@@ -115,6 +116,11 @@ inline bool TcpSocket::bind (const int& port)
   {
     return false;
   }
+}
+
+inline int TcpSocket::peek () const
+{
+  return (sockStreamIn->peek());
 }
 
 #endif 

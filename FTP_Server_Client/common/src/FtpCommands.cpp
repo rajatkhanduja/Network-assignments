@@ -59,10 +59,17 @@ int replaceSpaces (string& list)
 
   while ( (offset = list.find_first_of (' ', offset)) != string::npos)
   {
-    if ( offset >0 && list[offset-1] != '\\' )    
+    if ( offset >0)
     {
-      list[offset] = '\n'; 
+      if (list[offset - 1] != '\\')
+        list[offset] = '\n'; 
+      else
+      {
+        list.erase (offset - 1, 1);
+        offset--;
+      }
     }
+
     offset++;
     count++;
   }

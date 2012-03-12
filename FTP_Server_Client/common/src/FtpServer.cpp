@@ -6,10 +6,12 @@
 #include <sstream>
 #include <FtpCommands.h>
 #include <fstream>
+#include <list>
 
 using std::stringstream;
 using std::istringstream;
 using std::ifstream;
+using std::list;
 
 const char* FtpServer::defaultDir = "/tmp/";
 
@@ -30,18 +32,6 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
   listenSocket = new TcpSocket (socketFD, *(server.listenSocket));
   dataSocket = NULL;
 }
-
-/*
-FtpServer::~FtpServer ()
-{
-  if (listenSocket)
-    delete listenSocket;
-
-  if (dataSocket)
-    delete dataSocket;
-
-}
-*/
 
 void FtpServer::handleCommand (const int& command, const string& arg)
 {
@@ -80,7 +70,9 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               istringstream tmpStream(arg);
               string token;
               openSocket = setupDataSocket();
+              std::cerr << "Beginning processing" << std::endl;
               
+              string errFiles;
               while ( std::getline(tmpStream, token, '\n'))
               {
                 std::cerr << "Getting file " << token << std::endl;
@@ -91,18 +83,35 @@ void FtpServer::handleCommand (const int& command, const string& arg)
                   std::cerr << "File opened.\n";
                   *openSocket << token;
                   *openSocket << (*fileStream);
-                  tmp = new string();
                   fileStream->close();
                 }
-/*                else
+                else
                 {
-                  tmp   = new string();
-                  (*tmp) += (char) Ftp::InvalidArg;
-                  *listenSocket << *tmp;
-                }*/
+                  errFiles += string(token); 
+                  errFiles += "\n";
+                  std::cerr << "Added " << token << " to errFiles" << std::endl;
+                  std::cerr << errFiles << std::endl;
+                }
                }
-               *tmp += (char) Ftp::Done;
-               *openSocket << *tmp;
+
+               std::cerr << errFiles.length(); 
+
+               if ( errFiles.length () > 0 )
+               {
+                  tmp = new string();
+                  *tmp += (char) Ftp::InvalidArg;
+                  std::cerr << "Sending error message\n";
+                  *openSocket << *tmp;
+                  std::cerr << "Sent error message\n";
+                  *openSocket << errFiles;
+                  std::cerr << "Sent files\n";
+               }
+
+               errFiles.clear ();
+               errFiles += (char) Ftp::Done;
+
+               *openSocket << errFiles;
+
                break;
   }
 

@@ -95,26 +95,36 @@ bool FtpClient::getFiles (string& files)
    * space.
    */
 
-  int n =  1 + replaceSpaces (files) ;
-  std::cerr << n << std::endl;
+  int n = replaceSpaces (files) ;
   string * filename, *data;
-  filename = getData ( (n > 1) ? Ftp::Get : Ftp::MGet, files);
+  filename = getData (Ftp::Get, files);
+  
+  std::cerr << filename->length() << " " << (int) (*filename)[0] << std::endl;
 
-  while ( (*filename)[0] != Ftp::Done)
+  while ( (*filename)[0] != Ftp::Done && (*filename)[0] != Ftp::InvalidArg)
   {
-    if ( (filename->compare ("")) )
-    {
-      data = getData ();
-    }
-
+    if ( !filename->compare ("") )
+      break;
+    data = getData ();
     std::cerr << "Filename : " << *filename << " :-\n";
     std::cerr << *data ;
     putFileStream (*filename, *data);
-    if ( n > 0 )
-      filename = getData();
- }
+    filename = getData();
+    n--;
+  }
  
-  return true;
+  std::cerr << (int) (*filename)[0] << std::endl;
+  std::cerr << ((*filename)[0] == Ftp::InvalidArg) << std::endl;
+  std::cerr << "Files received\n";
+
+  if ( ((*filename)[0] == (int) Ftp::InvalidArg ) )
+  {
+    data = getData ();
+    std::cerr << "Error in files:\n" << *data;
+  }
+
+  std::cerr << "Done\n";
+  return (n == 0);
 }
 
 bool FtpClient::terminate ()
