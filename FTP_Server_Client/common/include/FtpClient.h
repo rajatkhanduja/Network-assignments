@@ -39,7 +39,7 @@ class FtpClient
 
     // Put file(s)
     bool putFile  (const string& file);
-    bool putFiles (const string& files);
+    bool putFiles (string& files);
 
     // Terminate connection
     bool terminate ();

@@ -58,13 +58,15 @@ string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
   }
   
 
-  // Listen for data port number or Invalid argument.
+  // Listen for data port number.
   commandPort >> reply;
 
   if ( reply[0] != Ftp::PortVal )
   {
+    reply = (char) Ftp::InvalidCommand;
+    commandPort << reply;
     std::cerr << Ftp::response (reply[0]);
-    return (new string());
+    throw ("Port value for data not received.\n");
   }
 
   reply.erase (0,1);
@@ -137,7 +139,7 @@ bool FtpClient::getFiles (string& files)
   return (n == 0);
 }
 
-bool putFiles (string &files)
+bool FtpClient::putFiles (string &files)
 {
   int n = replaceSpaces (files);
   n = (n > 0) ? n : 1;
@@ -158,10 +160,10 @@ bool putFiles (string &files)
       if( *fileStream )
       {
         *fileStream >> data;
-        dataPort << 
         dataPort <<  data;
-    }
+      }
 
+    }
   }
 }
 

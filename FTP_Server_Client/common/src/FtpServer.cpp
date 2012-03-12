@@ -150,7 +150,7 @@ TcpSocket * FtpServer::setupDataSocket ()
 
     std::cerr << dataSocket->port() << " " << tmp << std::endl;
     
-    portMsg += (char) Ftp::PortVal;
+    portMsg  = (char) Ftp::PortVal;
     portMsg += tmp;
     
     *listenSocket << portMsg;
@@ -185,7 +185,7 @@ void FtpServer::serve ()
   // Set the current directory to defaultDir.
   chdir (defaultDir);
 
-  std::cerr << "Serving\n";  
+  std::cerr << this << " Now Serving\n";  
   while ( *listenSocket >> msg )
   {
     // Recieve the command.

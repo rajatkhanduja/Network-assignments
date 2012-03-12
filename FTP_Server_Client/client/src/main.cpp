@@ -97,7 +97,7 @@ int main (int argc, char* argv[])
     std::cerr << "Connection Established\n";
     string filename("test");
     std::cerr << client.getFiles (filename);
-    st::cerr << client.listDir();
+//    std::cerr << client.listDir();
     client.terminate ();
 
   }
