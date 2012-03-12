@@ -3,6 +3,9 @@
 #include <FtpClient.h>
 #include <FtpCommands.h>
 #include <cstdlib>
+#include <sstream>
+
+using std::istringstream;
 
 const char * FtpClient :: defaultDir = "/tmp/client/";
 
@@ -71,6 +74,9 @@ string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
 
   dataPort.connect (host, strtol (reply.c_str(), 0, 0));
 
+  if ( code == Ftp::Put )
+    return NULL;
+
   return getData();
     
 }
@@ -79,6 +85,7 @@ string FtpClient::listDir (const string& dir, const bool& recursive)
 {
   string * reply = getData (Ftp::Dir, dir);
   
+  closeDataPort();
   return *reply;
 }
 
@@ -86,6 +93,7 @@ string FtpClient::listLocalDir (const string& dir, const bool& recursive)
 {
   string * reply = (::dir (dir));
 
+  closeDataPort ();
   return *reply;
 }
 
@@ -124,7 +132,37 @@ bool FtpClient::getFiles (string& files)
   }
 
   std::cerr << "Done\n";
+
+  closeDataPort ();
   return (n == 0);
+}
+
+bool putFiles (string &files)
+{
+  int n = replaceSpaces (files);
+  n = (n > 0) ? n : 1;
+  string data;
+  ifstream * fileStream;
+
+  // Setup the dataSocket for transmission.
+
+
+  while ( n-- )
+  {
+    istringstream tmpStream(files);
+
+    while (getline (tmpStream, files, '\n') )
+    {
+      fileStream = getFileStream (files);
+      
+      if( *fileStream )
+      {
+        *fileStream >> data;
+        dataPort << 
+        dataPort <<  data;
+    }
+
+  }
 }
 
 bool FtpClient::terminate ()
@@ -137,4 +175,9 @@ bool FtpClient::terminate ()
   commandPort >> command;
   
   return (command[0] == 1);
+}
+
+bool FtpClient::closeDataPort ()
+{
+  return ( dataPort.close());
 }

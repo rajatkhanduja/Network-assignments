@@ -40,7 +40,7 @@ string * dir (const string& directory)
 
 ifstream * getFileStream (const string& fileName)
 {
-	ifstream * fileRead = new ifstream (fileName.c_str());
+	ifstream * fileRead = new ifstream (fileName.c_str(), std::ios::in | std::ios::binary);
 
 	if ( fileRead->is_open ())
 	{
@@ -79,7 +79,7 @@ int replaceSpaces (string& list)
 
 bool putFileStream (const string& filename, const string& data) 
 {
-  ofstream file(filename.c_str());
+  ofstream file(filename.c_str(), std::ios::out | std::ios::binary);
   
   if ( file.is_open())
   {
