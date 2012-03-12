@@ -40,8 +40,9 @@ list<string> FtpClient::dir (const string& dir)
     dataPort.connect (host, strtol (reply.c_str(), 0, 0));
 
     dataPort >> reply;
+      
     
-    std::cerr << reply;
+    std::cerr << "Received : "<< reply << std::endl;
     
     list<string> response;
     return response;

@@ -26,6 +26,42 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
 
 }
 
+void FtpServer::setupDataSocket ()
+{
+    string portMsg, tmp;
+    
+    // Create the necessary data socket.
+    dataSocket = new TcpSocket();
+    
+    if( !dataSocket )
+    {
+      throw "Couldn't open dataSocket\n";
+    }
+    dataSocket->bind();
+
+    std::cerr << "Opened dataSocket\n" << std::endl;
+
+    // Send the port number for the dataSocket.
+    stringstream portString;
+    portString << dataSocket->port();
+    portString >> tmp;
+    std::cerr << dataSocket->port() << " " << tmp << std::endl;
+    portMsg += (char) Ftp::PortVal;
+    portMsg += tmp;
+    *listenSocket << portMsg;
+
+    // Wait for confirmation (Accept)
+    *listenSocket >> tmp;
+
+    if ( (int) tmp[0] != Ftp::Accept)
+    {
+      throw "Unexpected Response received.\n";
+    }
+
+
+}
+
+
 /* Function to let the newly spawned FtpServer object (after the accept 
  * method) to serve the client.
  * This separation from the main class facilitates multithreading.
@@ -103,10 +139,17 @@ void FtpServer::serve ()
     std::cerr << "Waiting for request on data socket..." << std::endl;
 
     // Reply appropriately.
-    dataSocket->accept();
+    dataSocket->listen(Ftp::defaultBackLog);
+    int newSocket = dataSocket->accept();
+    TcpSocket *attachedDataSocket = new TcpSocket (newSocket, *dataSocket);
+    
+    *attachedDataSocket << reply;
 
-    std::cerr << "Sending data : " << std::endl;
-    *dataSocket << reply;
+    std::cerr << "Sent Data. Closing dataSocket" << std::endl;
+
+    attachedDataSocket->close();
+    dataSocket->close();
+
 
     if (command == Ftp::Terminate)
     {
