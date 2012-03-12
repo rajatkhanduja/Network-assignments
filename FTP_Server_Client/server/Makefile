@@ -8,7 +8,7 @@ CFLAGS = -I$(COMMON)/include -Iinclude/ -I$(COMMON)
 OBJECTS = ${OBJ}/main.o
 
 all: common ${OBJECTS}
-	${CC} $(OBJECTS) $(COMMON_LIB) -o ${BIN}/client.out
+	${CC} $(OBJECTS) $(COMMON_LIB) -o ${BIN}/server.out
   
 ${OBJ}/%.o : ${SRC}/%.cpp
 	${CC} -c -g ${CFLAGS} $< -o $@
