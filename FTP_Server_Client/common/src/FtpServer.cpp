@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <errno.h>
 #include <sstream>
+#include <FtpServerCommands.h>
 
 using std::stringstream;
 
@@ -26,7 +27,18 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
 
 }
 
-void FtpServer::setupDataSocket ()
+void FtpServer::handleCommand (const int& command, const string& arg, TcpSocket * openSocket)
+{
+  switch (command)
+  {
+    case Ftp::Dir : 
+              *openSocket << (* dir (arg));
+  }
+  return;
+}
+
+
+TcpSocket * FtpServer::setupDataSocket ()
 {
     string portMsg, tmp;
     
@@ -59,6 +71,12 @@ void FtpServer::setupDataSocket ()
     }
 
 
+    dataSocket->listen(Ftp::defaultBackLog);
+    int newSocket = dataSocket->accept();
+    
+//    std::cerr << "Returning attached socket.\n" << std::endl;
+    
+    return (new TcpSocket (newSocket, *dataSocket));
 }
 
 
@@ -93,10 +111,11 @@ void FtpServer::serve ()
     }
     else
     {
-      // Send a Reject.
+      // Send a Reject and listen for another command.
       std::cerr << "Incorrect command\n";
       reply = (char) Ftp::InvalidCommand;
       *listenSocket << reply;
+      continue;
     }
     
     if ( command == Ftp::Terminate)
@@ -104,46 +123,14 @@ void FtpServer::serve ()
       break;
     }
 
-    // Create the necessary data socket.
-    dataSocket = new TcpSocket();
-    
-    if( !dataSocket )
-    {
-      throw "Couldn't open dataSocket\n";
-    }
-    dataSocket->bind();
+    TcpSocket *attachedDataSocket = setupDataSocket ();
 
-    std::cerr << "Opened dataSocket\n" << std::endl;
-
-    // Send the port number for the dataSocket.
-    stringstream portString;
-    portString << dataSocket->port();
-    portString >> tmp;
-    std::cerr << dataSocket->port() << " " << tmp << std::endl;
-    reply.clear();
-    reply += (char) Ftp::PortVal;
-    reply += tmp;
-    *listenSocket << reply;
-
-    // Wait for confirmation (Accept)
-    *listenSocket >> tmp;
-
-    if ( (int) tmp[0] != Ftp::Accept)
-    {
-      throw "Unexpected Response received.\n";
-    }
-
+    std::cerr << "Processing command" << std::endl;
     /* Call appropriate functions to handle the command */
-    reply = "ABC DEF";
+    handleCommand (command, msg, attachedDataSocket);
 
-    std::cerr << "Waiting for request on data socket..." << std::endl;
-
-    // Reply appropriately.
-    dataSocket->listen(Ftp::defaultBackLog);
-    int newSocket = dataSocket->accept();
-    TcpSocket *attachedDataSocket = new TcpSocket (newSocket, *dataSocket);
     
-    *attachedDataSocket << reply;
+//    *attachedDataSocket << reply;
 
     std::cerr << "Sent Data. Closing dataSocket" << std::endl;
 

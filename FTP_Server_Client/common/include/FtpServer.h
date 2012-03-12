@@ -24,6 +24,10 @@ class FtpServer
   private:
     TcpSocket *listenSocket;
     TcpSocket *dataSocket;
+
+    TcpSocket * setupDataSocket ();
+
+    void handleCommand (const int& command, const string& arg, TcpSocket * openSocket);
 };
 
 #endif    // End of file
