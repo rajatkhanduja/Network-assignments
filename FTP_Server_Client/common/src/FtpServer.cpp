@@ -10,6 +10,8 @@
 using std::stringstream;
 using std::ifstream;
 
+const char* FtpServer::defaultDir = "/tmp/";
+
 FtpServer::FtpServer (int port, const int& queueLength)
 {
   listenSocket = new TcpSocket();
@@ -29,17 +31,41 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
 
 }
 
-void FtpServer::handleCommand (const int& command, const string& arg, TcpSocket * openSocket)
+void FtpServer::handleCommand (const int& command, const string& arg)
 {
+  /* Set up the datasocket. This includes sending information
+   * about the socket to the client and waiting for it to connect 
+   */
+  TcpSocket *openSocket = NULL;
+
   switch (command)
   {
     case Ftp::Dir : 
+              openSocket = setupDataSocket ();
               *openSocket << (* dir (arg));
               break;
 
+    case Ftp::ChDir:
+              if ( 0 == chdir (arg.c_str()))
+              { 
+                *openSocket << arg;
+              }
+              else
+              {
+                
+              }
+    
     case Ftp::Get :
-               break;
+              openSocket = setupDataSocket ();
+              break;
   }
+
+  if ( openSocket )
+  {
+    openSocket->close();
+    dataSocket->close();
+  }
+
   return;
 }
 
@@ -99,6 +125,10 @@ void FtpServer::serve ()
 {
   string msg, reply, tmp;
   int command;  
+  
+  // Set the current directory to defaultDir.
+  chdir (defaultDir);
+
   std::cerr << "Serving\n";  
   while ( *listenSocket >> msg )
   {
@@ -134,18 +164,10 @@ void FtpServer::serve ()
       break;
     }
 
-    /* Set up the datasocket. This includes sending information
-     * about the socket to the client and waiting for it to connect 
-     */
-    TcpSocket *attachedDataSocket = setupDataSocket ();
-
     /* Call appropriate functions to handle the command */
-    handleCommand (command, msg, attachedDataSocket);
+    handleCommand (command, msg);
 
     std::cerr << "Sent Data. Closing dataSocket" << std::endl;
-
-    attachedDataSocket->close();
-    dataSocket->close();
 
     msg.clear ();
     reply.clear ();

@@ -23,6 +23,7 @@ namespace Ftp
 		Dir,
 		Terminate,
 		PortVal,
+		ChDir,
 		CommandEnd
 	};
 

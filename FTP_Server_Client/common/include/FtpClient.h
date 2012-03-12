@@ -13,7 +13,8 @@ using std::string;
 class FtpClient
 {
   public:
-
+    
+  
     // Connection-related methods.
     bool connectToHost (const string& host, const int& port);
 

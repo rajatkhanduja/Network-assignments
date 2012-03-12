@@ -8,8 +8,8 @@
 class FtpServer
 {
   public:
-    // Constructor
-    
+    static const char* defaultDir;
+    /* Constructor */
     // Sets up a server lisening to port with queue length
     FtpServer (int port = 0, const int& queueLength = Ftp::defaultBackLog); 
     FtpServer (int socketFd, const FtpServer& server);
@@ -27,7 +27,8 @@ class FtpServer
 
     TcpSocket * setupDataSocket ();
 
-    void handleCommand (const int& command, const string& arg, TcpSocket * openSocket);
+    void handleCommand (const int& command, const string& arg);
 };
+
 
 #endif    // End of file

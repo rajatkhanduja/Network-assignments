@@ -35,7 +35,7 @@ string * dir (const string& directory)
 	return response;
 }
 
-ifstream * getFile (const string& fileName)
+ifstream * getFileStream (const string& fileName)
 {
 	ifstream * fileRead = new ifstream (fileName.c_str());
 

@@ -1,6 +1,7 @@
 /* File containing the definition of FtpClient Class and its functions. */
 
 #include <FtpClient.h>
+#include <FtpCommands.h>
 #include <cstdlib>
 
 bool FtpClient::connectToHost (const string& host, const int& port)
@@ -91,6 +92,13 @@ string FtpClient::listDir (const string& dir, const bool& recursive)
 {
   string * reply = getData (Ftp::Dir, dir);
   
+  return *reply;
+}
+
+string FtpClient::listLocalDir (const string& dir, const bool& recursive)
+{
+  string * reply = (::dir (dir));
+
   return *reply;
 }
 
