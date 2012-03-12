@@ -95,16 +95,25 @@ bool FtpClient::getFiles (string& files)
    * space.
    */
 
-  
+  int n =  1 + replaceSpaces (files) ;
+  std::cerr << n << std::endl;
+  string * filename, *data;
+  filename = getData ( (n > 1) ? Ftp::Get : Ftp::MGet, files);
 
-  string * filename = getData (Ftp::Get, files);
-  string * data     = getData ();
+  while ( (*filename)[0] != Ftp::Done)
+  {
+    if ( (filename->compare ("")) )
+    {
+      data = getData ();
+    }
 
-  std::cerr << "Filename : " << *filename << " :-\n";
-  std::cerr << *data ;
-
-  putFileStream (*filename, *data);
-  
+    std::cerr << "Filename : " << *filename << " :-\n";
+    std::cerr << *data ;
+    putFileStream (*filename, *data);
+    if ( n > 0 )
+      filename = getData();
+ }
+ 
   return true;
 }
 

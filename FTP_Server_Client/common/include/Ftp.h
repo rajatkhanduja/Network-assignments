@@ -37,6 +37,7 @@ namespace Ftp
     InvalidCommand,
     TempReject,
     PermReject,
+    Done,
     InvalidArg      /* Use in cases where the command is correct but the argument is incorrect. 
                      * For instance, a file that does not exist or cannot be opened.
                      */

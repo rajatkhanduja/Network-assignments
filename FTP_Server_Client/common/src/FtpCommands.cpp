@@ -1,6 +1,7 @@
 #include <FtpCommands.h>
 #include <dirent.h>
 #include <cstring>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -47,6 +48,7 @@ ifstream * getFileStream (const string& fileName)
 	}
 	else
 	{
+    std::cerr << "Couldn't open file " << fileName << " check\n";
 		return NULL;
 	}
 }

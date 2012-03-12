@@ -8,6 +8,7 @@
 #include <fstream>
 
 using std::stringstream;
+using std::istringstream;
 using std::ifstream;
 
 const char* FtpServer::defaultDir = "/tmp/";
@@ -76,22 +77,33 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               }
     
     case Ftp::Get :
-              std::cerr << "Getting file " << arg << std::endl;
-              ifstream *fileStream = getFileStream (arg);
-              if ( fileStream)
+              istringstream tmpStream(arg);
+              string token;
+              openSocket = setupDataSocket();
+              
+              while ( std::getline(tmpStream, token, '\n'))
               {
-                openSocket = setupDataSocket();
-                *openSocket << arg;
-                *openSocket << (*fileStream);
-                fileStream->close();
-              }
-              else
-              {
-                tmp   = new string();
-                (*tmp) += (char) Ftp::InvalidArg;
-                *listenSocket << *tmp;
-              }
-              break;
+                std::cerr << "Getting file " << token << std::endl;
+                std::cerr << (int) token[token.length() - 1];
+                ifstream *fileStream = getFileStream (token);
+                if ( fileStream)
+                {
+                  std::cerr << "File opened.\n";
+                  *openSocket << token;
+                  *openSocket << (*fileStream);
+                  tmp = new string();
+                  fileStream->close();
+                }
+/*                else
+                {
+                  tmp   = new string();
+                  (*tmp) += (char) Ftp::InvalidArg;
+                  *listenSocket << *tmp;
+                }*/
+               }
+               *tmp += (char) Ftp::Done;
+               *openSocket << *tmp;
+               break;
   }
 
   if ( openSocket )
