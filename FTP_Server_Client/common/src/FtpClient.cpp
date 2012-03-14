@@ -12,6 +12,7 @@ const char * FtpClient :: defaultDir = "/tmp/client/";
 FtpClient::FtpClient ()
 {
   chdir (defaultDir);
+  dataPortConnected = false;
 }
 
 bool FtpClient::connectToHost (const string& host, const int& port)
@@ -34,7 +35,7 @@ string * FtpClient::getData ()
   string *finalReply = new string();
   dataPort >> *finalReply;
   
-  std::cerr << "Received"<< std::endl;
+  std::cerr << "Received : " << *finalReply << std::endl;
    
   return finalReply;
 }
@@ -58,22 +59,29 @@ string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
   }
   
 
-  // Listen for data port number or Invalid argument.
+  // Listen for data port number.
   commandPort >> reply;
 
   if ( reply[0] != Ftp::PortVal )
   {
+    reply = (char) Ftp::InvalidCommand;
+    commandPort << reply;
     std::cerr << Ftp::response (reply[0]);
-    return (new string());
+    throw ("Port value for data not received.\n");
   }
 
   reply.erase (0,1);
   tmp.clear();
   tmp += (char) Ftp::Accept;
-  commandPort << tmp; 
 
-  dataPort.connect (host, strtol (reply.c_str(), 0, 0));
-
+  if ( !dataPortConnected )
+  {
+    dataPort.connect (host, strtol (reply.c_str(), 0, 0));
+    dataPortConnected = true;
+  }    
+  
+  std::cerr << "Connected to data port "<< reply << "\n";
+  
   if ( code == Ftp::Put )
     return NULL;
 
@@ -85,7 +93,7 @@ string FtpClient::listDir (const string& dir, const bool& recursive)
 {
   string * reply = getData (Ftp::Dir, dir);
   
-  closeDataPort();
+//  closeDataPort();
   return *reply;
 }
 
@@ -93,7 +101,7 @@ string FtpClient::listLocalDir (const string& dir, const bool& recursive)
 {
   string * reply = (::dir (dir));
 
-  closeDataPort ();
+//  closeDataPort ();
   return *reply;
 }
 
@@ -137,7 +145,7 @@ bool FtpClient::getFiles (string& files)
   return (n == 0);
 }
 
-bool putFiles (string &files)
+bool FtpClient::putFiles (string &files)
 {
   int n = replaceSpaces (files);
   n = (n > 0) ? n : 1;
@@ -158,10 +166,10 @@ bool putFiles (string &files)
       if( *fileStream )
       {
         *fileStream >> data;
-        dataPort << 
         dataPort <<  data;
-    }
+      }
 
+    }
   }
 }
 

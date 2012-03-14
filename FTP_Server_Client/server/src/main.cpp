@@ -78,7 +78,7 @@ int main (int argc, char *argv[])
     std::cerr << "New Connection\n";   
     newConn->serve ();
     std::cerr << "End of transmission\n";
-//    delete newConn;
+    delete newConn;
     newConn = NULL;
   }
   
