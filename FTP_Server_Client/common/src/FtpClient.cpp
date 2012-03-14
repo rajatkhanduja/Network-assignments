@@ -73,7 +73,6 @@ string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
   reply.erase (0,1);
   tmp.clear();
   tmp += (char) Ftp::Accept;
-//  commandPort << tmp; 
 
   if ( !dataPortConnected )
   {
@@ -81,7 +80,7 @@ string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
     dataPortConnected = true;
   }    
   
-  std::cerr << "Connected to data port\n";
+  std::cerr << "Connected to data port "<< reply << "\n";
   
   if ( code == Ftp::Put )
     return NULL;
@@ -94,7 +93,7 @@ string FtpClient::listDir (const string& dir, const bool& recursive)
 {
   string * reply = getData (Ftp::Dir, dir);
   
-  closeDataPort();
+//  closeDataPort();
   return *reply;
 }
 
@@ -102,7 +101,7 @@ string FtpClient::listLocalDir (const string& dir, const bool& recursive)
 {
   string * reply = (::dir (dir));
 
-  closeDataPort ();
+//  closeDataPort ();
   return *reply;
 }
 

@@ -30,7 +30,7 @@ class FtpServer
     TcpSocket *openSocket;
 
     // Private functions.
-    TcpSocket * setupDataSocket ();
+    void setupDataSocket ();
     void handleCommand (const int& command, const string& arg);
 };
 
