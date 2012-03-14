@@ -12,6 +12,7 @@ const char * FtpClient :: defaultDir = "/tmp/client/";
 FtpClient::FtpClient ()
 {
   chdir (defaultDir);
+  dataPortConnected = false;
 }
 
 bool FtpClient::connectToHost (const string& host, const int& port)
@@ -34,7 +35,7 @@ string * FtpClient::getData ()
   string *finalReply = new string();
   dataPort >> *finalReply;
   
-  std::cerr << "Received"<< std::endl;
+  std::cerr << "Received : " << *finalReply << std::endl;
    
   return finalReply;
 }
@@ -72,10 +73,16 @@ string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
   reply.erase (0,1);
   tmp.clear();
   tmp += (char) Ftp::Accept;
-  commandPort << tmp; 
+//  commandPort << tmp; 
 
-  dataPort.connect (host, strtol (reply.c_str(), 0, 0));
-
+  if ( !dataPortConnected )
+  {
+    dataPort.connect (host, strtol (reply.c_str(), 0, 0));
+    dataPortConnected = true;
+  }    
+  
+  std::cerr << "Connected to data port\n";
+  
   if ( code == Ftp::Put )
     return NULL;
 

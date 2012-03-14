@@ -27,6 +27,7 @@ class FtpServer
   private:
     TcpSocket *listenSocket;
     TcpSocket *dataSocket;
+    TcpSocket *openSocket;
 
     // Private functions.
     TcpSocket * setupDataSocket ();

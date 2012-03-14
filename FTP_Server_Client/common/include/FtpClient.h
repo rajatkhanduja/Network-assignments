@@ -25,7 +25,7 @@ class FtpClient
 
     /* FTP commands */
     // List directory
-    string listDir (const string& dir = string(), const bool& recursive = false);
+    string listDir (const string& dir = string("."), const bool& recursive = false);
 
     // List local directory
     string listLocalDir (const string& dir = string(), const bool& recursive = false);
@@ -50,6 +50,7 @@ class FtpClient
     string remoteDir;
     string host;
     TcpSocket dataPort, commandPort;
+    bool dataPortConnected;
 
     string * getData (Ftp::CommandCodes code, const string& arg);
     string * getData ();  // This assumes the dataPort is already connected.

@@ -25,6 +25,7 @@ FtpServer::FtpServer (int port, const int& queueLength)
     throw listenSocket->getError();
   }
   dataSocket = NULL;
+  openSocket = NULL;
 }
 
 FtpServer::FtpServer (int socketFD, const FtpServer& server)
@@ -38,7 +39,10 @@ void FtpServer::handleCommand (const int& command, const string& arg)
   /* Set up the datasocket. This includes sending information
    * about the socket to the client and waiting for it to connect 
    */
-  TcpSocket *openSocket = NULL;
+  if (openSocket == NULL)
+  {
+    openSocket = setupDataSocket ();
+  }
   string *tmp = NULL;
   
   switch (command)
@@ -115,20 +119,21 @@ void FtpServer::handleCommand (const int& command, const string& arg)
                break;
   }
 
+/*
   if ( openSocket )
   {
     std::cerr << "Sent Data. Closing dataSocket" << std::endl;
     openSocket->close();
     dataSocket->close();
   }
-
+*/
   return;
 }
 
 
 TcpSocket * FtpServer::setupDataSocket ()
 {
-    string portMsg, tmp;
+    string tmp;
     
     // Create the necessary data socket.
     dataSocket = new TcpSocket();
@@ -150,24 +155,25 @@ TcpSocket * FtpServer::setupDataSocket ()
 
     std::cerr << dataSocket->port() << " " << tmp << std::endl;
     
+    string portMsg;
     portMsg  = (char) Ftp::PortVal;
     portMsg += tmp;
     
     *listenSocket << portMsg;
 
     // Wait for confirmation (Accept)
-    *listenSocket >> tmp;
+//    *listenSocket >> tmp;
 
-    if ( (int) tmp[0] != Ftp::Accept)
+/*    if ( (int) tmp[0] != Ftp::Accept)
     {
       throw "Unexpected Response received.\n";
     }
-
-
-    dataSocket->listen(Ftp::defaultBackLog);
+*/
+//    dataSocket->listen(0);
+    std::cerr << "Listening on data socket.\n" << std::endl;
     int newSocket = dataSocket->accept();
     
-//    std::cerr << "Returning attached socket.\n" << std::endl;
+    std::cerr << "Returning attached socket.\n" << std::endl;
     
     return (new TcpSocket (newSocket, *dataSocket));
 }
