@@ -5,7 +5,7 @@ COMMON = ../common
 COMMON_LIB = $(COMMON)/obj/FtpServerClient.a
 CC = g++
 CFLAGS = -I$(COMMON)/include -Iinclude/ -I$(COMMON)
-OBJECTS = ${OBJ}/main.o
+OBJECTS = $(OBJ)/interface.o ${OBJ}/main.o
 
 all: common ${OBJECTS}
 	${CC} $(OBJECTS) $(COMMON_LIB) -o ${BIN}/client.out

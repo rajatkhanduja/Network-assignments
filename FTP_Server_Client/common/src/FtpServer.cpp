@@ -46,7 +46,7 @@ void FtpServer::handleCommand (const int& command, const string& arg)
     case Ftp::Dir : 
               tmp = dir(arg);
               setupDataSocket();
-              *openSocket << *tmp;
+              *openSocket << string ( get_current_dir_name ());
               break;
 
     case Ftp::ChDir:
@@ -59,12 +59,11 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               {
                 tmp = new string();
                 tmp->clear();
-                *tmp += "Failed :";
-                *tmp += arg; 
-                *tmp += "\n";
+                *tmp += "Failed";
                 *openSocket << *tmp;
                 delete tmp;
               }
+              break;
     
     case Ftp::Get :
               istringstream tmpStream(arg);

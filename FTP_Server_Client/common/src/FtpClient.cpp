@@ -12,7 +12,19 @@ const char * FtpClient :: defaultDir = "/tmp/client/";
 FtpClient::FtpClient ()
 {
   chdir (defaultDir);
+  localDir  = string (defaultDir);
+  remoteDir = string ("/tmp/");
   dataPortConnected = false;
+}
+
+string FtpClient::pwd () const 
+{
+  return remoteDir;
+}
+
+string FtpClient::lpwd () const
+{
+  return localDir;
 }
 
 bool FtpClient::connectToHost (const string& host, const int& port)
@@ -105,6 +117,36 @@ string FtpClient::listLocalDir (const string& dir, const bool& recursive)
   return *reply;
 }
 
+// TODO : Initially set the remote directory variable. 
+bool FtpClient::changeDir (const string& dir)
+{
+  string * reply = getData (Ftp::ChDir, dir);
+
+  if ( reply->compare ("Failed"))
+  {
+    remoteDir = *reply;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+bool FtpClient::changeLocalDir (const string& dir)
+{
+  if (chdir (dir.c_str()) == 0)
+  {
+    localDir = dir;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 bool FtpClient::getFiles (string& files)
 {
   /* MGet is followed by a list of names, separated by
@@ -171,6 +213,7 @@ bool FtpClient::putFiles (string &files)
 
     }
   }
+  return true;
 }
 
 bool FtpClient::terminate ()

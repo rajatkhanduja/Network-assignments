@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <errno.h>
 #include <common.h>
+#include <interface.h>
 
 using std::cout;
 using std::cerr;
@@ -91,15 +92,23 @@ int main (int argc, char* argv[])
   }
   
   FtpClient client;
+  string userInput;
 
   if ( client.connectToHost(hostAddr, port) )
   {
     std::cerr << "Connection Established\n";
-    string filename("test");
+//    string filename("test");
 //    std::cerr << client.getFiles (filename);
-    std::cerr << client.listDir(".");
-    std::cerr << client.listDir(".");
-    client.terminate ();
+//    std::cerr << client.listDir(".");
+//    std::cerr << client.listDir(".");
+
+    while ( 1 ) 
+    {
+      std::cerr << client.pwd () << " > ";
+      getline (std::cin, userInput);
+
+      std::cerr << handleInput (userInput, client);
+    }
   }
   
   return 0;

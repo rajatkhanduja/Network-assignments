@@ -31,8 +31,8 @@ class FtpClient
     string listLocalDir (const string& dir = string(), const bool& recursive = false);
 
     // Change directory.
-    string changeDir (const string &dir);
-    string changeLocalDir (const string &dir);
+    bool changeDir (const string &dir);
+    bool changeLocalDir (const string &dir);
 
     // Fetch file(s)
     bool getFiles (string& files);
@@ -43,6 +43,10 @@ class FtpClient
 
     // Terminate connection
     bool terminate ();
+
+    // Get working directories
+    string pwd () const;
+    string lpwd () const;
 
   private:
     string command;
