@@ -60,7 +60,8 @@ void FtpServer::handleCommand (const int& command, const string& arg)
    */
   string *tmp = NULL;
   bool recursive = false;
-  
+  string data;
+
   switch (command)
   {
     case Ftp::Dir : 
@@ -85,10 +86,16 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               }
               break;
 
-    case Ftp::RPut:
+    case Ftp::RPut :
               recursive = true;
-    case Ftp::Put: 
-              
+    case Ftp::Put : 
+              setupDataSocket();
+              tmp = new string ();
+              while (*openSocket >> *tmp)
+              {
+                *openSocket >> data;
+                putFileStream (*tmp, data);
+              }
               break;
     
     case Ftp::RGet : 
