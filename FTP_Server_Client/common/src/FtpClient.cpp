@@ -223,70 +223,23 @@ bool FtpClient::putFiles (string& files, const bool& recursive)
   int n = replaceSpaces (files);
   n = (n > 0) ? n : 1;
   string data;
-  ifstream * fileStream;
-
+  
   // Setup the dataSocket for transmission.
   setupDataSocket ( recursive ? Ftp::RPut : Ftp::Put, string());
 
-  string errorFiles;
-  list <string> filenames;
+  // Send data and get error files. 
+  string errorFiles = sendFileData (files, recursive, dataPort);
 
-  while ( n-- )
+  if ( errorFiles.length() )
   {
-    istringstream tmpStream(files);
-    int pos;
-
-    while (getline (tmpStream, files, '\n') )
-    {
-      
-      if ( (pos = files.find ('*')) != string::npos || recursive )
-      {
-        if (pos == files.length() - 1)
-        {
-          files.erase (pos, 1);
-        }
-        
-        filenames = dir ( files, !recursive, recursive);
-
-        list <string>::iterator itr, itr_end;
-
-        for (itr = filenames.begin (), itr_end = filenames.end (); itr != itr_end; itr++)
-        {
-          if ((*itr)[itr->length() - 1] == '/' )
-          {
-            dataSocket << (*itr);
-            dataSocket << string();
-          }
-          else
-          {
-            
-          }
-        }
-      }
-    }
-      
-      
-      fileStream = getFileStream (files);
-      if( *fileStream )
-      {
-        dataPort << files;
-        getline (*fileStream, data, (char) EOF);
-        dataPort <<  data;
-      }
-      else
-      {
-        errorFiles += files;
-        errorFiles += "\n";
-      }
-    }
-  }
-
-  if ( errorFiles.length())
-  {
-    std::cerr << "Client-side error sending the following files.\n" << files;
+    // Report error to the client.
+    std::cerr << "Files that couldn't be pushed : \n" << errorFiles;
+    return false;
   }
   else
+  {
     return true;
+  }
 }
 
 bool FtpClient::terminate ()

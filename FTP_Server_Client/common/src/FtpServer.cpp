@@ -34,26 +34,6 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
   dataSocket = NULL;
 }
 
-bool FtpServer::transmitFile (const string& filename, const TcpSocket& socket)
-{
-  /* Returns filename if it couldn't be opened. */
-  ifstream *fileStream = getFileStream (filename);
-
-  if ( fileStream != NULL)
-  {
-    std::cerr << "File opened. " << filename << " " << fileStream << std::endl ;
-    socket << filename;
-    socket << (*fileStream);
-    fileStream->close();
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-}
-
-
 void FtpServer::handleCommand (const int& command, const string& arg)
 {
   /* Set up the datasocket. This includes sending information
@@ -104,46 +84,10 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               std::cerr << "Recursive\n";
     case Ftp::Get:
               setupDataSocket();
-              istringstream tmpStream(arg);
-              string token;
-              list<string> filenames;
-              bool readList;
-              tmp = new string();
-              std::cerr << "Beginning processing" << std::endl;
+              tmp = new string ();
               
-              string errFiles;
-              while ( std::getline(tmpStream, token, '\n'))
-              {
-                std::cerr << "Getting file " << token << std::endl;
-                int pos;
-                if ( (pos = token.find ('*')) != string::npos || recursive  )
-                {
-                  // Only complete directories supported.
-                  if (pos == token.length() - 1 ) 
-                  {
-                    token.erase (pos, 1);
-                  }
-
-                  filenames = dir (token, (!recursive), recursive );
-                
-                  list<string>::iterator itr, itr_end;
-                  for (itr = filenames.begin(), itr_end = filenames.end(); itr != itr_end ; itr++)
-                  {
-                    if ((*itr)[itr->length() - 1] == '/')
-                    {
-                      *openSocket << (*itr);
-                      *openSocket << string();
-                    }
-                    else
-                      transmitFile (*itr, *openSocket);
-                  }
-                }
-                else if ( !transmitFile (token, *openSocket) )
-                {
-                  errFiles += string(token); 
-                  errFiles += "\n";
-                }
-              }
+              string errFiles = sendFileData (arg, recursive, *openSocket);
+      
               if ( errFiles.length () > 0 )
               {
                 tmp = new string();
@@ -158,7 +102,6 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               errFiles.clear ();
               errFiles += (char) Ftp::Done;
               *openSocket << errFiles;
-
 
               break;
   }

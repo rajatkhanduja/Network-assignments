@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include <list>
+#include <TcpSocket.h>
 
 using std::string;
 using std::ifstream;
@@ -43,8 +44,10 @@ int replaceSpaces (string& list);    // Returns the number of replacements.
  * assumes a list of filenames (with or without wild-card character and 
  * sends the data over the given socket. Based on the 'recursive' variable
  * it can send data recursively.
+ *
+ * Function returns a string of newline separated list of files that couldn't be sent.
  */
-//bool sendData (const string& 
+string sendFileData (const string& arg, const bool& recursive, TcpSocket& socket);
 
 
 inline bool isDir (const string& filename)
