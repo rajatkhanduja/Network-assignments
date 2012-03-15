@@ -38,14 +38,17 @@ list<string> dir (const string& directory, const bool& onlyRegularFiles, const b
 
     path = directory + string (dp->d_name);
 
+    std::cerr <<"testing file " << path <<  " " << onlyRegularFiles << S_ISDIR (info.st_mode) << std::endl;
+
     stat (path.c_str(), &info);
     if (S_ISREG (info.st_mode))
     {
-      std::cerr << "Is a regular file :" << dp->d_name << "\n";
+      std::cerr << "Is a regular file :" << path << "\n";
       filenames.push_back (path);
     }
     else if ( !onlyRegularFiles && S_ISDIR (info.st_mode) )
     {
+      std::cerr << "Is directory : " << path << std::endl;
       // Check if the path indicates its a directory.
       if (!isDir(path))
       {
@@ -57,7 +60,7 @@ list<string> dir (const string& directory, const bool& onlyRegularFiles, const b
 
       if ( recursive )
       {
-        list <string> tmp = dir ( string(dp->d_name), false, true);
+        list <string> tmp = dir ( path, false, true);
         list <string>::iterator itr, itr_end;
 
         for ( itr = tmp.begin(), itr_end = tmp.end(); itr != itr_end; itr++)

@@ -158,7 +158,7 @@ bool FtpClient::getFiles (string& files, const bool& recursive)
 
   int n = replaceSpaces (files) ;
   string * filename, *data;
-  filename = getData (recursive ? Ftp::Get : Ftp::RGet, files);
+  filename = getData (recursive ? Ftp::RGet : Ftp::Get, files);
   
   std::cerr << filename->length() << " " << (int) (*filename)[0] << std::endl;
 

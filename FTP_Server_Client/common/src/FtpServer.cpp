@@ -87,6 +87,7 @@ void FtpServer::handleCommand (const int& command, const string& arg)
     
     case Ftp::RGet : 
               recursive = true;
+              std::cerr << "Recursive\n";
     case Ftp::Get:
               istringstream tmpStream(arg);
               string token;

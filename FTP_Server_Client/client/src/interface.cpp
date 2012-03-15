@@ -58,7 +58,7 @@ string handleInput (string& userInput, FtpClient& client)
   else if ( ! command.compare ("rget"))
   {
     // Execute 'rget' command
-//    return client.getFiles (arguments, true);
+    return (client.getFiles (arguments, true) ? "Command successful\n" : "Command failed\n");
   }
   else if ( ! command.compare ("rput"))
   {
