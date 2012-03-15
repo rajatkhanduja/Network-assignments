@@ -21,9 +21,9 @@ namespace Ftp
 	{
 		CommandStart = 1,
 		Get,
-		MGet,
+		RGet,
 		Put,
-		MPut,
+		RPut,
 		Dir,
 		Terminate,
 		PortVal,

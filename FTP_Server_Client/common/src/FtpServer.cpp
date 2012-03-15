@@ -40,6 +40,7 @@ void FtpServer::handleCommand (const int& command, const string& arg)
    * about the socket to the client and waiting for it to connect 
    */
   string *tmp = NULL;
+  bool recursive = false;
   
   switch (command)
   {
@@ -65,9 +66,13 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               }
               break;
     
-    case Ftp::Get :
+    case Ftp::RGet : 
+              recursive = true;
+    case Ftp::Get:
               istringstream tmpStream(arg);
               string token;
+              list<string> filenames;
+              bool readList;
               setupDataSocket();
               std::cerr << "Beginning processing" << std::endl;
               
@@ -75,7 +80,20 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               while ( std::getline(tmpStream, token, '\n'))
               {
                 std::cerr << "Getting file " << token << std::endl;
-                std::cerr << (int) token[token.length() - 1];
+                int pos;
+                if ( (pos = token.find ('*')) != string::npos  )
+                {
+                  // Only complete directories supported.
+                  if (pos == token.length() - 1 ) 
+                  {
+                    token.erase (pos, 1);
+                    filenames = dir(token, true, recursive);
+                  }
+                  else
+                  {
+                    // Send error and exit.
+                  }
+                }
                 ifstream *fileStream = getFileStream (token);
                 if ( fileStream)
                 {

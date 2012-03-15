@@ -4,6 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdio>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 using std::ofstream;
 using std::stringstream;
@@ -13,6 +16,7 @@ string * dir (const string& directory)
 	dirent * dp;
 	DIR *dfd;
 	string * response = new string();
+  struct stat info;
 
 	if ( (dfd = opendir (directory.c_str())) == NULL )
 	{
@@ -31,6 +35,11 @@ string * dir (const string& directory)
 		
 		(*response) += "\n";
 		(*response) += dp->d_name;
+
+    if ( lstat (dp->d_name, &info) )
+    {
+      perror ("lstat");
+    }
 	}
 
 	closedir (dfd);
