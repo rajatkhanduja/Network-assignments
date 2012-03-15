@@ -34,15 +34,16 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
   dataSocket = NULL;
 }
 
-bool FtpServer::getCommandHandler (const string& filename)
+bool FtpServer::transmitFile (const string& filename, const TcpSocket& socket)
 {
   /* Returns filename if it couldn't be opened. */
   ifstream *fileStream = getFileStream (filename);
+
   if ( fileStream != NULL)
   {
     std::cerr << "File opened. " << filename << " " << fileStream << std::endl ;
-    *openSocket << filename;
-    *openSocket << (*fileStream);
+    socket << filename;
+    socket << (*fileStream);
     fileStream->close();
     return true;
   }
@@ -102,12 +103,12 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               recursive = true;
               std::cerr << "Recursive\n";
     case Ftp::Get:
+              setupDataSocket();
               istringstream tmpStream(arg);
               string token;
               list<string> filenames;
               bool readList;
               tmp = new string();
-              setupDataSocket();
               std::cerr << "Beginning processing" << std::endl;
               
               string errFiles;
@@ -134,10 +135,10 @@ void FtpServer::handleCommand (const int& command, const string& arg)
                       *openSocket << string();
                     }
                     else
-                      getCommandHandler (*itr);
+                      transmitFile (*itr, *openSocket);
                   }
                 }
-                else if ( !getCommandHandler (token) )
+                else if ( !transmitFile (token, *openSocket) )
                 {
                   errFiles += string(token); 
                   errFiles += "\n";

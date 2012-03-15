@@ -229,15 +229,44 @@ bool FtpClient::putFiles (string& files, const bool& recursive)
   setupDataSocket ( recursive ? Ftp::RPut : Ftp::Put, string());
 
   string errorFiles;
+  list <string> filenames;
 
   while ( n-- )
   {
     istringstream tmpStream(files);
+    int pos;
 
     while (getline (tmpStream, files, '\n') )
     {
-      fileStream = getFileStream (files);
       
+      if ( (pos = files.find ('*')) != string::npos || recursive )
+      {
+        if (pos == files.length() - 1)
+        {
+          files.erase (pos, 1);
+        }
+        
+        filenames = dir ( files, !recursive, recursive);
+
+        list <string>::iterator itr, itr_end;
+
+        for (itr = filenames.begin (), itr_end = filenames.end (); itr != itr_end; itr++)
+        {
+          if ((*itr)[itr->length() - 1] == '/' )
+          {
+            dataSocket << (*itr);
+            dataSocket << string();
+          }
+          else
+          {
+            
+          }
+        }
+      }
+    }
+      
+      
+      fileStream = getFileStream (files);
       if( *fileStream )
       {
         dataPort << files;
