@@ -34,6 +34,25 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
   dataSocket = NULL;
 }
 
+bool FtpServer::getCommandHandler (const string& filename)
+{
+    /* Returns filename if it couldn't be opened. */
+  ifstream *fileStream = getFileStream (filename);
+  if ( fileStream)
+  {
+    std::cerr << "File opened.\n";
+    *openSocket << filename;
+    *openSocket << (*fileStream);
+    fileStream->close();
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
 void FtpServer::handleCommand (const int& command, const string& arg)
 {
   /* Set up the datasocket. This includes sending information
@@ -73,6 +92,7 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               string token;
               list<string> filenames;
               bool readList;
+              tmp = new string();
               setupDataSocket();
               std::cerr << "Beginning processing" << std::endl;
               
@@ -87,49 +107,37 @@ void FtpServer::handleCommand (const int& command, const string& arg)
                   if (pos == token.length() - 1 ) 
                   {
                     token.erase (pos, 1);
-                    filenames = dir(token, true, recursive);
+//                    filenames = dir(token, true, recursive);
                   }
                   else
                   {
                     // Send error and exit.
                   }
                 }
-                ifstream *fileStream = getFileStream (token);
-                if ( fileStream)
-                {
-                  std::cerr << "File opened.\n";
-                  *openSocket << token;
-                  *openSocket << (*fileStream);
-                  fileStream->close();
-                }
-                else
+                
+                if ( !getCommandHandler (token) )
                 {
                   errFiles += string(token); 
                   errFiles += "\n";
-                  std::cerr << "Added " << token << " to errFiles" << std::endl;
-                  std::cerr << errFiles << std::endl;
                 }
-               }
+              }
+              if ( errFiles.length () > 0 )
+              {
+                tmp = new string();
+                *tmp += (char) Ftp::InvalidArg;
+                std::cerr << "Sending error message\n";
+                *openSocket << *tmp;
+                std::cerr << "Sent error message\n";
+                *openSocket << errFiles;
+                std::cerr << "Sent files\n";
+              }
 
-               std::cerr << errFiles.length(); 
+              errFiles.clear ();
+              errFiles += (char) Ftp::Done;
+              *openSocket << errFiles;
 
-               if ( errFiles.length () > 0 )
-               {
-                  tmp = new string();
-                  *tmp += (char) Ftp::InvalidArg;
-                  std::cerr << "Sending error message\n";
-                  *openSocket << *tmp;
-                  std::cerr << "Sent error message\n";
-                  *openSocket << errFiles;
-                  std::cerr << "Sent files\n";
-               }
 
-               errFiles.clear ();
-               errFiles += (char) Ftp::Done;
-
-               *openSocket << errFiles;
-
-               break;
+              break;
   }
 
 /*

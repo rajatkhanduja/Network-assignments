@@ -104,10 +104,17 @@ int main (int argc, char* argv[])
 
     while ( 1 ) 
     {
-      std::cerr << client.pwd () << " > ";
-      getline (std::cin, userInput);
+      try 
+      {
+        std::cerr << client.pwd () << " > ";
+        getline (std::cin, userInput);
 
-      std::cerr << handleInput (userInput, client);
+        std::cerr << handleInput (userInput, client);
+      }
+      catch (string e)
+      {
+        std::cerr << "Caught exception : " << e << std::endl;
+      }
     }
   }
   

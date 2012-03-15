@@ -68,7 +68,7 @@ string handleInput (string& userInput, FtpClient& client)
   else
   {
     // Unknown command. Report error.
-    return ("Unknown command" + command);
+    return string ("Unknown command" + command);
   }
 
 

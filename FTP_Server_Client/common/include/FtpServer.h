@@ -32,6 +32,7 @@ class FtpServer
     // Private functions.
     void setupDataSocket ();
     void handleCommand (const int& command, const string& arg);
+    bool getCommandHandler (const string& filename);
 };
 
 
