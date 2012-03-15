@@ -16,7 +16,7 @@ list<string> dir (const string& directory, const bool& onlyRegularFiles, const b
   dirent * dp;
   DIR *dfd;
   list<string> filenames;
-  string tmp;
+  string path;
 
   struct stat info;
 
@@ -36,21 +36,24 @@ list<string> dir (const string& directory, const bool& onlyRegularFiles, const b
       continue;
     }
 
-    stat (dp->d_name, &info);
+    path = directory + string (dp->d_name);
+
+    stat (path.c_str(), &info);
     if (S_ISREG (info.st_mode))
     {
       std::cerr << "Is a regular file :" << dp->d_name << "\n";
-      filenames.push_back (dp->d_name);
+      filenames.push_back (path);
     }
     else if ( !onlyRegularFiles && S_ISDIR (info.st_mode) )
     {
-      tmp = string (dp->d_name);
-      if (tmp[tmp.length() - 1] != '/')
+      // Check if the path indicates its a directory.
+      if (!isDir(path))
       {
-        tmp += "/";
+        // If not, add a slash.
+        path += "/";
       }
 
-      filenames.push_back (tmp);
+      filenames.push_back (path);
 
       if ( recursive )
       {
