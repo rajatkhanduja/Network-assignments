@@ -4,6 +4,8 @@
 #include <FtpCommands.h>
 #include <cstdlib>
 #include <sstream>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 using std::istringstream;
 
@@ -148,7 +150,7 @@ bool FtpClient::changeLocalDir (const string& dir)
   }
 }
 
-bool FtpClient::getFiles (string& files)
+bool FtpClient::getFiles (string& files, const bool& recursive)
 {
   /* MGet is followed by a list of names, separated by
    * space.
@@ -156,7 +158,7 @@ bool FtpClient::getFiles (string& files)
 
   int n = replaceSpaces (files) ;
   string * filename, *data;
-  filename = getData (Ftp::Get, files);
+  filename = getData (recursive ? Ftp::Get : Ftp::RGet, files);
   
   std::cerr << filename->length() << " " << (int) (*filename)[0] << std::endl;
 
@@ -164,6 +166,12 @@ bool FtpClient::getFiles (string& files)
   {
     if ( !filename->compare ("") )
       break;
+  
+    if (isDir (*filename))
+    {
+      mkdir (filename->c_str(), 0777);
+    }
+  
     data = getData ();
     std::cerr << "Filename : " << *filename << " :-\n";
     std::cerr << *data ;
@@ -172,8 +180,6 @@ bool FtpClient::getFiles (string& files)
     n--;
   }
  
-  std::cerr << (int) (*filename)[0] << std::endl;
-  std::cerr << ((*filename)[0] == Ftp::InvalidArg) << std::endl;
   std::cerr << "Files received\n";
 
   if ( ((*filename)[0] == (int) Ftp::InvalidArg ) )
@@ -184,11 +190,10 @@ bool FtpClient::getFiles (string& files)
 
   std::cerr << "Done\n";
 
-  closeDataPort ();
   return (n == 0);
 }
 
-bool FtpClient::putFiles (string &files)
+bool FtpClient::putFiles (string& files, const bool& recursive)
 {
   int n = replaceSpaces (files);
   n = (n > 0) ? n : 1;

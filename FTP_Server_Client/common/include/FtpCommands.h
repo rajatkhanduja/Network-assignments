@@ -12,14 +12,36 @@ using std::string;
 using std::ifstream;
 using std::list;
 
-/* Each command should return a single string as a reply. */
-
+/* Function to return a list of file and directory names. Directory names 
+ * end with a '/' whereas file names do not.
+ * One could use this function to return a list of regular files in a folder
+ * or to recursively list all those files.
+ */
 list <string> dir ( const string& directory, const bool& onlyRegularFile, const bool& recursive);
+
+/* Function to return a string of regular files in a directory separated by
+ * new-line character.
+ */
 string * dir (const string& directory);
+
+/* Function to return the ifstream pointer obtained by opening the file
+ * fileName. 
+ */
 ifstream * getFileStream (const string& fileName);
+
+/* Function to dump the string data into the file filename. */
 bool putFileStream (const string& filename, const string& data);
 
 // Auxillary functions
-int replaceSpaces (string& list);    // True if replacements occur.
+
+/* This function replaces the spaces in the string list, except when the 
+ * space is preceded by a backslash. 
+ */
+int replaceSpaces (string& list);    // Returns the number of replacements.
+
+inline bool isDir (const string& filename)
+{
+  return ( filename[filename.length() - 1] == '/');
+}
 
 #endif	// End of file

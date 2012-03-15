@@ -65,6 +65,15 @@ string handleInput (string& userInput, FtpClient& client)
     // Execute 'rput' command
 //    return client.putFiles (arguments, true);
   }
+  else if ( ! command.compare ("pwd"))
+  {
+    // Execute 'pwd' command
+    return client.pwd ();
+  }
+  else if ( ! command.compare ("lpwd"))
+  {
+    return client.lpwd ();
+  }
   else
   {
     // Unknown command. Report error.

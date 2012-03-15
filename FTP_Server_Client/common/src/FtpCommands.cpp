@@ -11,12 +11,68 @@
 using std::ofstream;
 using std::stringstream;
 
+list<string> dir (const string& directory, const bool& onlyRegularFiles, const bool& recursive)
+{
+  dirent * dp;
+  DIR *dfd;
+  list<string> filenames;
+  string tmp;
+
+  struct stat info;
+
+  // check if the directory exists and/or can be opened.
+  if ( (dfd = opendir (directory.c_str())) == NULL )
+  {
+    return filenames;
+  }
+
+  // list the files in the directory
+  while ( (dp = readdir (dfd)) != NULL )
+  {
+    // skip "." and ".." entries.
+    if (strcmp (dp->d_name, "." ) == 0
+      || strcmp (dp->d_name, "..") == 0 )
+    {
+      continue;
+    }
+
+    stat (dp->d_name, &info);
+    if (S_ISREG (info.st_mode))
+    {
+      std::cerr << "Is a regular file :" << dp->d_name << "\n";
+      filenames.push_back (dp->d_name);
+    }
+    else if ( !onlyRegularFiles && S_ISDIR (info.st_mode) )
+    {
+      tmp = string (dp->d_name);
+      if (tmp[tmp.length() - 1] != '/')
+      {
+        tmp += "/";
+      }
+
+      filenames.push_back (tmp);
+
+      if ( recursive )
+      {
+        list <string> tmp = dir ( string(dp->d_name), false, true);
+        list <string>::iterator itr, itr_end;
+
+        for ( itr = tmp.begin(), itr_end = tmp.end(); itr != itr_end; itr++)
+        {
+          filenames.push_back (*itr);
+        }
+      }
+    }
+  }
+
+  return filenames;
+}
+
 string * dir (const string& directory)
 {
 	dirent * dp;
 	DIR *dfd;
 	string * response = new string();
-  struct stat info;
 
 	if ( (dfd = opendir (directory.c_str())) == NULL )
 	{
@@ -33,13 +89,8 @@ string * dir (const string& directory)
 			continue;
 		}
 		
-		(*response) += "\n";
 		(*response) += dp->d_name;
-
-    if ( lstat (dp->d_name, &info) )
-    {
-      perror ("lstat");
-    }
+		(*response) += "\n";
 	}
 
 	closedir (dfd);
@@ -57,8 +108,9 @@ ifstream * getFileStream (const string& fileName)
 	}
 	else
 	{
-    std::cerr << "Couldn't open file " << fileName << " check\n";
-		return NULL;
+    std::cerr << "Couldn't open file " << fileName << "\n";
+    delete fileRead;
+		return 0;
 	}
 }
 

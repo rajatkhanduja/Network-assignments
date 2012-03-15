@@ -35,11 +35,10 @@ class FtpClient
     bool changeLocalDir (const string &dir);
 
     // Fetch file(s)
-    bool getFiles (string& files);
+    bool getFiles (string& files, const bool& recursive = false);
 
     // Put file(s)
-    bool putFile  (const string& file);
-    bool putFiles (string& files);
+    bool putFiles (string& files, const bool& recursive = false);
 
     // Terminate connection
     bool terminate ();

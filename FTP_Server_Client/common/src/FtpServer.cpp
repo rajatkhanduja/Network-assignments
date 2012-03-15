@@ -36,11 +36,11 @@ FtpServer::FtpServer (int socketFD, const FtpServer& server)
 
 bool FtpServer::getCommandHandler (const string& filename)
 {
-    /* Returns filename if it couldn't be opened. */
+  /* Returns filename if it couldn't be opened. */
   ifstream *fileStream = getFileStream (filename);
-  if ( fileStream)
+  if ( fileStream != NULL)
   {
-    std::cerr << "File opened.\n";
+    std::cerr << "File opened. " << filename << " " << fileStream << std::endl ;
     *openSocket << filename;
     *openSocket << (*fileStream);
     fileStream->close();
@@ -66,7 +66,7 @@ void FtpServer::handleCommand (const int& command, const string& arg)
     case Ftp::Dir : 
               tmp = dir(arg);
               setupDataSocket();
-              *openSocket << string ( get_current_dir_name ());
+              *openSocket << *tmp;
               break;
 
     case Ftp::ChDir:
@@ -101,21 +101,29 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               {
                 std::cerr << "Getting file " << token << std::endl;
                 int pos;
-                if ( (pos = token.find ('*')) != string::npos  )
+                if ( (pos = token.find ('*')) != string::npos || recursive  )
                 {
                   // Only complete directories supported.
                   if (pos == token.length() - 1 ) 
                   {
                     token.erase (pos, 1);
-//                    filenames = dir(token, true, recursive);
                   }
-                  else
+
+                  filenames = dir (token, (!recursive), recursive );
+                
+                  list<string>::iterator itr, itr_end;
+                  for (itr = filenames.begin(), itr_end = filenames.end(); itr != itr_end ; itr++)
                   {
-                    // Send error and exit.
+                    if ((*itr)[itr->length() - 1] == '/')
+                    {
+                      *openSocket << (*itr);
+                      *openSocket << string();
+                    }
+                    else
+                      getCommandHandler (*itr);
                   }
                 }
-                
-                if ( !getCommandHandler (token) )
+                else if ( !getCommandHandler (token) )
                 {
                   errFiles += string(token); 
                   errFiles += "\n";
