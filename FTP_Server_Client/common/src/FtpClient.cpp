@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define DIRMODE 0777
+
 using std::istringstream;
 
 const char * FtpClient :: defaultDir = "/tmp/client/";
@@ -54,13 +56,27 @@ string * FtpClient::getData ()
   return finalReply;
 }
 
-string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
+
+/* Function to setup the data socket with the server. 
+ * This function is required before sending any DATA. One may setup the 
+ * socket once. Every call made to this function after that is 
+ * redundant and it is taken care by the function that the dataSocket is not
+ * re-established. 
+ * 
+ * The function sends the necessary initial code and argument and then sets up
+ * the data socket. So any command and argument should be passed to this and 
+ * this function will communicate with the server.
+ */
+void FtpClient::setupDataSocket (Ftp::CommandCodes code, const string& arg)
 {
   string command, reply, tmp;
 
   // Send command
   command += (char) code;
-  command += arg;
+  
+  if ( code != Ftp::Put && code != Ftp::RPut)
+    command += arg;
+  
   commandPort << command;
 
   // Wait for the reply.
@@ -69,10 +85,10 @@ string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
   if ( reply[0] != Ftp::Accept)
   {
     std::cerr << Ftp::response (reply[0]);
-    return (new string());
+    throw string("Unexpected response.");
   }
-  
 
+  // If the data port is not already connected, establish a connection.
   if ( !dataPortConnected )
   {
     // Listen for data port number.
@@ -95,13 +111,21 @@ string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
     
     std::cerr << "Connected to data port "<< reply << "\n";
   }    
-  
-  
-  if ( code == Ftp::Put )
-    return NULL;
 
+  return ;
+}
+
+/* This function has to be called the first time some data has to be fetched
+ * from the server. This sets up the datasocket and gets the data. Use this 
+ * everytime when first establishing the connection with the server for any
+ * command. Henceforth, use getData() as it returns the data that follows 
+ * regardless of the command and the argument(s) that were passed. 
+ */
+string * FtpClient::getData (Ftp::CommandCodes code, const string& arg)
+{
+  setupDataSocket(code, arg);
+  
   return getData();
-    
 }
 
 string FtpClient::listDir (const string& dir, const bool& recursive)
@@ -169,7 +193,7 @@ bool FtpClient::getFiles (string& files, const bool& recursive)
   
     if (isDir (*filename))
     {
-      mkdir (filename->c_str(), 0777);
+      mkdir (filename->c_str(), DIRMODE);
     }
   
     data = getData ();
@@ -193,6 +217,7 @@ bool FtpClient::getFiles (string& files, const bool& recursive)
   return (n == 0);
 }
 
+
 bool FtpClient::putFiles (string& files, const bool& recursive)
 {
   int n = replaceSpaces (files);
@@ -201,7 +226,9 @@ bool FtpClient::putFiles (string& files, const bool& recursive)
   ifstream * fileStream;
 
   // Setup the dataSocket for transmission.
+  setupDataSocket ( recursive ? Ftp::RPut : Ftp::Put, string());
 
+  string errorFiles;
 
   while ( n-- )
   {
@@ -213,13 +240,24 @@ bool FtpClient::putFiles (string& files, const bool& recursive)
       
       if( *fileStream )
       {
+        dataPort << files;
         *fileStream >> data;
         dataPort <<  data;
       }
-
+      else
+      {
+        errorFiles += files;
+        errorFiles += "\n";
+      }
     }
   }
-  return true;
+
+  if ( errorFiles.length())
+  {
+    std::cerr << "Client-side error sending the following files.\n" << files;
+  }
+  else
+    return true;
 }
 
 bool FtpClient::terminate ()

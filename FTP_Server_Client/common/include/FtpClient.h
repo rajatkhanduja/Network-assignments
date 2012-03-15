@@ -57,6 +57,7 @@ class FtpClient
 
     string * getData (Ftp::CommandCodes code, const string& arg);
     string * getData ();  // This assumes the dataPort is already connected.
+    void setupDataSocket (Ftp::CommandCodes code, const string& arg);
     bool closeDataPort ();
 };
 

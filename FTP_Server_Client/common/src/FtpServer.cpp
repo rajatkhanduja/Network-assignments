@@ -84,6 +84,12 @@ void FtpServer::handleCommand (const int& command, const string& arg)
                 delete tmp;
               }
               break;
+
+    case Ftp::RPut:
+              recursive = true;
+    case Ftp::Put: 
+              
+              break;
     
     case Ftp::RGet : 
               recursive = true;
