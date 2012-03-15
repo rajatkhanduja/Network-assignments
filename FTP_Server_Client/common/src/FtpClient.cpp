@@ -7,7 +7,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define DIRMODE 0777
 
 using std::istringstream;
 
@@ -180,41 +179,18 @@ bool FtpClient::getFiles (string& files, const bool& recursive)
    * space.
    */
 
-  int n = replaceSpaces (files) ;
-  string * filename, *data;
-  filename = getData (recursive ? Ftp::RGet : Ftp::Get, files);
+  replaceSpaces (files) ;
+  setupDataSocket (recursive ? Ftp::RGet : Ftp::Get, files);
   
-  std::cerr << filename->length() << " " << (int) (*filename)[0] << std::endl;
+  string errFiles = recvFileData (&dataPort);  
 
-  while ( (*filename)[0] != Ftp::Done && (*filename)[0] != Ftp::InvalidArg)
+  if ( errFiles.length())
   {
-    if ( !filename->compare ("") )
-      break;
-  
-    if (isDir (*filename))
-    {
-      mkdir (filename->c_str(), DIRMODE);
-    }
-  
-    data = getData ();
-    std::cerr << "Filename : " << *filename << " :-\n";
-    std::cerr << *data ;
-    putFileStream (*filename, *data);
-    filename = getData();
-    n--;
+    std::cerr << "Files unsuccessfully fetched\n" << errFiles;
+    return false;
   }
- 
-  std::cerr << "Files received\n";
-
-  if ( ((*filename)[0] == (int) Ftp::InvalidArg ) )
-  {
-    data = getData ();
-    std::cerr << "Error in files:\n" << *data;
-  }
-
-  std::cerr << "Done\n";
-
-  return (n == 0);
+  else
+    return true;
 }
 
 
@@ -223,41 +199,23 @@ bool FtpClient::putFiles (string& files, const bool& recursive)
   int n = replaceSpaces (files);
   n = (n > 0) ? n : 1;
   string data;
-  ifstream * fileStream;
-
+  
   // Setup the dataSocket for transmission.
   setupDataSocket ( recursive ? Ftp::RPut : Ftp::Put, string());
 
-  string errorFiles;
+  // Send data and get error files. 
+  string errorFiles = sendFileData (files, recursive, dataPort);
 
-  while ( n-- )
+  if ( errorFiles.length() )
   {
-    istringstream tmpStream(files);
-
-    while (getline (tmpStream, files, '\n') )
-    {
-      fileStream = getFileStream (files);
-      
-      if( *fileStream )
-      {
-        dataPort << files;
-        getline (*fileStream, data, (char) EOF);
-        dataPort <<  data;
-      }
-      else
-      {
-        errorFiles += files;
-        errorFiles += "\n";
-      }
-    }
-  }
-
-  if ( errorFiles.length())
-  {
-    std::cerr << "Client-side error sending the following files.\n" << files;
+    // Report error to the client.
+    std::cerr << "Files that couldn't be pushed : \n" << errorFiles;
+    return false;
   }
   else
+  {
     return true;
+  }
 }
 
 bool FtpClient::terminate ()
