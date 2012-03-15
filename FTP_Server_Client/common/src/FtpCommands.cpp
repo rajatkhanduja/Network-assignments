@@ -1,4 +1,5 @@
 #include <FtpCommands.h>
+#include <Ftp.h>
 #include <dirent.h>
 #include <cstring>
 #include <iostream>
@@ -11,6 +12,7 @@
 using std::ofstream;
 using std::istringstream;
 
+#define DIRMODE 0777
 
 list<string> dir (const string& directory, const bool& onlyRegularFiles, const bool& recursive)
 {
@@ -184,7 +186,6 @@ string sendFileData (const string& arg, const bool& recursive, TcpSocket& socket
   istringstream tmpStream(arg);
   string token;
   list<string> filenames;
-  bool readList;
   
   std::cerr << "Beginning processing" << std::endl;
               
@@ -192,7 +193,7 @@ string sendFileData (const string& arg, const bool& recursive, TcpSocket& socket
   while ( std::getline(tmpStream, token, '\n'))
   {
     std::cerr << "Getting file " << token << std::endl;
-    int pos;
+    unsigned int pos;
     if ( (pos = token.find ('*')) != string::npos || recursive  )
     {
       // Only complete directories supported.
@@ -225,4 +226,45 @@ string sendFileData (const string& arg, const bool& recursive, TcpSocket& socket
   return errFiles;
 }
 
+string recvFileData (TcpSocket& socket)
+{
+  
+  string filename, data;
+  
+  // Get filename from the network
+  while ( socket >> filename )
+  {   
+    if ( filename[0] == Ftp::Done || filename[0] == Ftp::InvalidArg )
+    {
+      break;
+    }
+
+    if ( filename.compare ("") )
+      break;
+  
+    if (isDir (filename))
+    {
+      mkdir (filename.c_str(), DIRMODE);
+    }
+  
+    // Get file content.
+    socket >> data;
+    std::cerr << "Filename : " << filename << " :-\n";
+    std::cerr << data ;
+    // Put content into file.
+    putFileStream (filename, data);
+  }
+ 
+  std::cerr << "Files received\n";
+
+  if ( filename[0] == Ftp::InvalidArg ) 
+  {
+    socket >> data;
+    return data;
+  }
+  else
+  {
+    return string();
+  }
+}
 

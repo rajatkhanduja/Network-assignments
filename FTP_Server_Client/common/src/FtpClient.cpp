@@ -7,7 +7,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define DIRMODE 0777
 
 using std::istringstream;
 
@@ -180,41 +179,14 @@ bool FtpClient::getFiles (string& files, const bool& recursive)
    * space.
    */
 
-  int n = replaceSpaces (files) ;
-  string * filename, *data;
-  filename = getData (recursive ? Ftp::RGet : Ftp::Get, files);
+  replaceSpaces (files) ;
+  setupDataSocket (recursive ? Ftp::RGet : Ftp::Get, files);
   
-  std::cerr << filename->length() << " " << (int) (*filename)[0] << std::endl;
+  string errFiles = recvFileData (dataPort);  
 
-  while ( (*filename)[0] != Ftp::Done && (*filename)[0] != Ftp::InvalidArg)
-  {
-    if ( !filename->compare ("") )
-      break;
-  
-    if (isDir (*filename))
-    {
-      mkdir (filename->c_str(), DIRMODE);
-    }
-  
-    data = getData ();
-    std::cerr << "Filename : " << *filename << " :-\n";
-    std::cerr << *data ;
-    putFileStream (*filename, *data);
-    filename = getData();
-    n--;
-  }
- 
-  std::cerr << "Files received\n";
+  std::cerr << "Files unsuccessfully fetched\n" << errFiles;
 
-  if ( ((*filename)[0] == (int) Ftp::InvalidArg ) )
-  {
-    data = getData ();
-    std::cerr << "Error in files:\n" << *data;
-  }
-
-  std::cerr << "Done\n";
-
-  return (n == 0);
+  return (errFiles.length());
 }
 
 

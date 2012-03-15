@@ -49,6 +49,13 @@ int replaceSpaces (string& list);    // Returns the number of replacements.
  */
 string sendFileData (const string& arg, const bool& recursive, TcpSocket& socket);
 
+/* Function to receive files from the network sent by using the above
+ * function. This function returns the list of files that have error. 
+ * 
+ * The error files makes sense on the client-side only as they are invalid
+ * arguments for the command.
+ */
+string recvFileData (TcpSocket& socket);
 
 inline bool isDir (const string& filename)
 {

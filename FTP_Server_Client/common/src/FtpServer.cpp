@@ -68,15 +68,9 @@ void FtpServer::handleCommand (const int& command, const string& arg)
               break;
 
     case Ftp::RPut :
-              recursive = true;
     case Ftp::Put : 
               setupDataSocket();
-              tmp = new string ();
-              while (*openSocket >> *tmp)
-              {
-                *openSocket >> data;
-                putFileStream (*tmp, data);
-              }
+              recvFileData (*openSocket);
               break;
     
     case Ftp::RGet : 
