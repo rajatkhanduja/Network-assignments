@@ -241,7 +241,7 @@ bool FtpClient::putFiles (string& files, const bool& recursive)
       if( *fileStream )
       {
         dataPort << files;
-        *fileStream >> data;
+        getline (*fileStream, data, (char) EOF);
         dataPort <<  data;
       }
       else
