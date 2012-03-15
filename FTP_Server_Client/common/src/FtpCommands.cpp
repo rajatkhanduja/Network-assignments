@@ -226,20 +226,17 @@ string sendFileData (const string& arg, const bool& recursive, TcpSocket& socket
   return errFiles;
 }
 
-string recvFileData (TcpSocket& socket)
+string recvFileData (TcpSocket * socket)
 {
   
   string filename, data;
-  
-  // Get filename from the network
-  while ( socket >> filename )
-  {   
-    if ( filename[0] == Ftp::Done || filename[0] == Ftp::InvalidArg )
-    {
-      break;
-    }
+ 
+  *socket >> filename;
 
-    if ( filename.compare ("") )
+  // Get filename from the network
+  while( filename[0] != Ftp::Done && filename[0] != Ftp::InvalidArg )
+  {
+    if ( ! filename.compare ("") )
       break;
   
     if (isDir (filename))
@@ -248,18 +245,20 @@ string recvFileData (TcpSocket& socket)
     }
   
     // Get file content.
-    socket >> data;
+    *socket >> data;
     std::cerr << "Filename : " << filename << " :-\n";
     std::cerr << data ;
     // Put content into file.
     putFileStream (filename, data);
+
+    *socket >> filename;
   }
  
   std::cerr << "Files received\n";
 
   if ( filename[0] == Ftp::InvalidArg ) 
   {
-    socket >> data;
+    *socket >> data;
     return data;
   }
   else

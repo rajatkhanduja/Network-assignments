@@ -70,7 +70,7 @@ void FtpServer::handleCommand (const int& command, const string& arg)
     case Ftp::RPut :
     case Ftp::Put : 
               setupDataSocket();
-              recvFileData (*openSocket);
+              recvFileData (openSocket);
               break;
     
     case Ftp::RGet : 

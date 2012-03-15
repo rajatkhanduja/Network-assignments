@@ -182,11 +182,15 @@ bool FtpClient::getFiles (string& files, const bool& recursive)
   replaceSpaces (files) ;
   setupDataSocket (recursive ? Ftp::RGet : Ftp::Get, files);
   
-  string errFiles = recvFileData (dataPort);  
+  string errFiles = recvFileData (&dataPort);  
 
-  std::cerr << "Files unsuccessfully fetched\n" << errFiles;
-
-  return (errFiles.length());
+  if ( errFiles.length())
+  {
+    std::cerr << "Files unsuccessfully fetched\n" << errFiles;
+    return false;
+  }
+  else
+    return true;
 }
 
 

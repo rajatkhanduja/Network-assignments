@@ -55,7 +55,7 @@ string sendFileData (const string& arg, const bool& recursive, TcpSocket& socket
  * The error files makes sense on the client-side only as they are invalid
  * arguments for the command.
  */
-string recvFileData (TcpSocket& socket);
+string recvFileData (TcpSocket * socket);
 
 inline bool isDir (const string& filename)
 {
