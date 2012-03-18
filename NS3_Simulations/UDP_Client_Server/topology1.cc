@@ -52,6 +52,11 @@ main (int argc, char * argv[])
   // Create the channels required by the topology.
   //
   NS_LOG_INFO ("Create channels.");
+  PointToPointHelper pointToPoint01, pointTopoint12, pointToPoint24,
+                     pointToPoint03, pointToPoint34;
+
+
+  pointToPoint01.SetChannelAttribute ();
 
  
   Ipv4AddressHelper ipv4;
