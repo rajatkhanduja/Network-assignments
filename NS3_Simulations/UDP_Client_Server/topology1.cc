@@ -1,3 +1,4 @@
+// vi: tabstop=2:expandtab
 /* Program to generate the following topography. 
  *
  * 
@@ -52,5 +53,7 @@ main (int argc, char * argv[])
   //
   NS_LOG_INFO ("Create channels.");
 
-  
+ 
+  Ipv4AddressHelper ipv4;
+
 }
