@@ -11,7 +11,7 @@ all: common ${OBJECTS}
 	${CC} $(OBJECTS) $(COMMON_LIB) -o ${BIN}/client.out
   
 ${OBJ}/%.o : ${SRC}/%.cpp
-	${CC} -c -g ${CFLAGS} $< -o $@
+	${CC} -c ${CFLAGS} $< -o $@
 
 common:
 	make -C $(COMMON) all 
@@ -21,4 +21,4 @@ common_clean : clean
 
 clean:
 	rm -f ${OBJ}/*.o
-	rm -f ${BIN}/*
+	rm -f ${BIN}/*.out

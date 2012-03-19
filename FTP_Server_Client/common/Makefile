@@ -9,7 +9,7 @@ OBJECTS = $(OBJ)/Ftp.o $(OBJ)/FtpCommands.o $(OBJ)/TcpSocket.o $(OBJ)/FtpClient.
 all: libServerClient
 
 $(OBJ)/%.o : $(SRC)/%.cpp
-	$(CC) -Wall -c -g $(CFLAGS) $< -o $@
+	$(CC) -Wall -c $(CFLAGS) $< -o $@
 
 libServerClient: $(OBJECTS)
 	$(AR) crs $(LIB_OBJ) $(OBJECTS) 
